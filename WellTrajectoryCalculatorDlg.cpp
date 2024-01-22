@@ -50,18 +50,18 @@ END_MESSAGE_MAP()
 
 
 
-CWellTrajectoryCalculatorDlg::CWellTrajectoryCalculatorDlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_WELLTRAJECTORYCALCULATOR_DIALOG, pParent)
+CCalcDlg::CCalcDlg(CWnd* pParent /*=nullptr*/)
+	: CDialogEx(IDD_2DDIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
-void CWellTrajectoryCalculatorDlg::DoDataExchange(CDataExchange* pDX)
+void CCalcDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 }
 
-BEGIN_MESSAGE_MAP(CWellTrajectoryCalculatorDlg, CDialogEx)
+BEGIN_MESSAGE_MAP(CCalcDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
@@ -70,7 +70,7 @@ END_MESSAGE_MAP()
 
 // CWellTrajectoryCalculatorDlg message handlers
 
-BOOL CWellTrajectoryCalculatorDlg::OnInitDialog()
+BOOL CCalcDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
@@ -104,7 +104,7 @@ BOOL CWellTrajectoryCalculatorDlg::OnInitDialog()
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
-void CWellTrajectoryCalculatorDlg::OnSysCommand(UINT nID, LPARAM lParam)
+void CCalcDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
 	{
@@ -121,7 +121,7 @@ void CWellTrajectoryCalculatorDlg::OnSysCommand(UINT nID, LPARAM lParam)
 //  to draw the icon.  For MFC applications using the document/view model,
 //  this is automatically done for you by the framework.
 
-void CWellTrajectoryCalculatorDlg::OnPaint()
+void CCalcDlg::OnPaint()
 {
 	if (IsIconic())
 	{
@@ -148,7 +148,7 @@ void CWellTrajectoryCalculatorDlg::OnPaint()
 
 // The system calls this function to obtain the cursor to display while the user drags
 //  the minimized window.
-HCURSOR CWellTrajectoryCalculatorDlg::OnQueryDragIcon()
+HCURSOR CCalcDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }

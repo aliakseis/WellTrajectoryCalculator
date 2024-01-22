@@ -6,11 +6,11 @@
 
 
 // CWellTrajectoryCalculatorDlg dialog
-class CWellTrajectoryCalculatorDlg : public CDialogEx
+class CCalcDlg : public CDialogEx
 {
 // Construction
 public:
-	CWellTrajectoryCalculatorDlg(CWnd* pParent = nullptr);	// standard constructor
+	CCalcDlg(CWnd* pParent = nullptr);	// standard constructor
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
