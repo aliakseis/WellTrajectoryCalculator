@@ -156,6 +156,14 @@ CCalcDlg::CCalcDlg(CWnd* pParent /*=nullptr*/)
 
 CCalcDlg::~CCalcDlg() = default;
 
+void CCalcDlg::DDX_Text_Ex(CDataExchange* pDX, int nIDC, float& value, int nFlag)
+{
+	if (!(m_nMode & nFlag) || m_bValidTrajectory)
+		DDX_Text(pDX, nIDC, value);
+	else if (!pDX->m_bSaveAndValidate)
+		GetDlgItem(nIDC)->SetWindowText(_T(""));
+}
+
 void CCalcDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
@@ -241,6 +249,9 @@ BOOL CCalcDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// Add extra initialization here
+
+    m_pView->SubclassDlgItem(IDC_TRAJECTORY_VIEW, this);
+
 	m_Sensitivity.SetRange(0, 20, FALSE);
 	m_Sensitivity.SetPos(10);
 	m_Sensitivity.SetLineSize(1);
@@ -310,6 +321,7 @@ HCURSOR CCalcDlg::OnQueryDragIcon()
 
 void CCalcDlg::OnOK()
 {
+    __super::OnOK();
 }
 
 
@@ -771,8 +783,11 @@ void CCalcDlg::OnButton8()
 
 void CCalcDlg::OnCancel()
 {
+    __super::OnCancel();
 	//Return(FALSE);
 }
+
+BOOL CCalcDlg::IsWorkingMode() { return 2 == NBits(m_nMode); }
 
 int  CCalcDlg::GetEditFlags()
 {

@@ -555,7 +555,7 @@ void CTrajView::OnPaint()
 void CTrajView::OnSize(UINT nType, int cx, int cy)
 {
 	__super::OnSize(nType, cx, cy);
-
+	/*
 	static bool bRecurs = false;
 	if(::IsWindow(m_CalcDlg.m_hWnd) && !bRecurs) 
 	{
@@ -572,7 +572,7 @@ void CTrajView::OnSize(UINT nType, int cx, int cy)
    					SWP_NOZORDER | SWP_NOACTIVATE );
 		bRecurs = false;
 	}
-
+	*/
 }
 
 void CTrajView::OnLButtonDown(UINT nFlags, CPoint point)

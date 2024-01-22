@@ -2,18 +2,17 @@
 // Microsoft Visual C++ generated include file.
 // Used by WellTrajectoryCalculator.rc
 //
-#define IDR_MAINFRAME					128
-#define IDM_ABOUTBOX					0x0010
-#define IDD_ABOUTBOX					100
-#define IDS_ABOUTBOX					101
-
 #define IDC_CLIPBOOK                    3
 #define IDR_2D_DESIGN                   3
 #define IDC_ADD_TO_CLIPBOOK             4
+#define IDM_ABOUTBOX                    0x0010
+#define IDD_ABOUTBOX                    100
+#define IDS_ABOUTBOX                    101
 #define IDD_2DDIALOG                    102
 #define IDC_NOACTION                    103
 #define IDD_3DWOptDlg                   112
 #define IDD_ConstraintsDlg              113
+#define IDR_MAINFRAME                   128
 #define IDD_3D_LOCATOR                  130
 #define IDD_2D_CLIPBOOK                 131
 #define IDD_NEW_CLIPBOOK_REC            132
@@ -111,6 +110,7 @@
 #define IDC_SPIN6                       1088
 #define IDC_SPIN7                       1089
 #define IDC_SPIN8                       1090
+#define IDC_TRAJECTORY_VIEW             1091
 #define IDC_Help                        1349
 #define IDM_S_TRAJ                      40800
 #define IDM_EXT_S_TRAJ                  40801
@@ -121,9 +121,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        146
+#define _APS_NEXT_RESOURCE_VALUE        147
 #define _APS_NEXT_COMMAND_VALUE         40804
-#define _APS_NEXT_CONTROL_VALUE         1084
+#define _APS_NEXT_CONTROL_VALUE         1092
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
