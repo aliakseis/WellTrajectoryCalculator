@@ -151,7 +151,10 @@ CCalcDlg::CCalcDlg(CWnd* pParent /*=nullptr*/)
 	m_bIsotropic = FALSE;
 	m_nTrajectoryType = tkExtendedSTrajectory;
 
+    m_pView = std::make_unique<CTrajView>(*this);
 }
+
+CCalcDlg::~CCalcDlg() = default;
 
 void CCalcDlg::DoDataExchange(CDataExchange* pDX)
 {
@@ -686,8 +689,7 @@ void CCalcDlg::OnApply()
 void CCalcDlg::OnIsotropic()
 {
 	m_bIsotropic = IsDlgButtonChecked(IDC_Isotropic);
-	CWnd* pParent = GetTrajView();//GetParent();
-	if (pParent) pParent->InvalidateRect(NULL);//&UpdateRect);
+	m_pView->InvalidateRect(NULL);//&UpdateRect);
 }
 
 BOOL CCalcDlg::MakeChoice(int nFlag, float* fVal, float fBound, int nCount, BOOL bExcludeZero)
@@ -807,8 +809,7 @@ void CCalcDlg::SetValidTrajectory(BOOL bValid)
 	GetDlgItem(IDC_ADD_TO_CLIPBOOK)->EnableWindow(bValid);
 	m_bValidTrajectory = bValid;
 	UpdateData(FALSE);
-	CWnd* pParent = GetTrajView();//GetParent();
-	if (pParent) pParent->InvalidateRect(NULL);//&UpdateRect);
+	m_pView->InvalidateRect(NULL);//&UpdateRect);
 }
 
 //void CCalcDlg::Restore(int nIndex)

@@ -6,6 +6,8 @@
 
 #include "PlaneTrajMath.h"
 
+#include <memory>
+
 enum
 {
 	tkJTrajectory = 0,
@@ -22,6 +24,9 @@ class CCalcDlg : public CDialogEx
 // Construction
 public:
 	CCalcDlg(CWnd* pParent = nullptr);	// standard constructor
+	~CCalcDlg();
+    CCalcDlg(const CCalcDlg&) = delete;
+	CCalcDlg& operator =(const CCalcDlg&) = delete;
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
@@ -90,7 +95,7 @@ protected:
 	//	EUCVariables eUnitType, int nUnitIDC);
 	void SetValidTrajectory(BOOL bValid);
 	void EnableButton(int nButtonID, int nSpinID, BOOL bEnable, BOOL bVisible);
-	CTrajView* GetTrajView();
+	//CTrajView* GetTrajView();
 
 	// Generated message map functions
 	//{{AFX_MSG(CCalcDlg)
@@ -134,6 +139,7 @@ private:
 	int   m_nTrajectoryType;
 	float m_fHitAngle;
 
+    std::unique_ptr<CTrajView> m_pView;
 
 // Implementation
 protected:

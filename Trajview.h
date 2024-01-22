@@ -24,6 +24,7 @@ public:
 	{
 		m_State = TVS_NONE;
 	}
+	virtual ~CTrajView();
 
 // Attributes
 public:
@@ -42,7 +43,6 @@ public:
 
 // Implementation
 protected:
-	virtual ~CTrajView();
 	//virtual void OnInitialUpdate();
 	void DrawAxes(CDC* pDC);
 	//virtual	void OnDraw(CDC* pDC);		// overridden to draw this view
