@@ -14,6 +14,8 @@ enum
 	tkExtendedSTrajectory
 };
 
+class CTrajView;
+
 // CWellTrajectoryCalculatorDlg dialog
 class CCalcDlg : public CDialogEx
 {
@@ -30,12 +32,22 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 
 	// Construction
-//public:
+public:
 //	CCalcDlg(CWnd* pParent = NULL);	// standard constructor
 //	BOOL Create(CWnd* pParent = NULL);
 	virtual void OnOK();
 	virtual void OnCancel();
 	bool TryToApply();
+
+	float	m_fPhi1;
+	float	m_fL1;
+	float	m_fBR1;
+	float	m_fPhi2;
+	float	m_fL2;
+	float	m_fBR2;
+	float	m_fPhi3;
+	float	m_fL3;
+
 
 	// Dialog Data
 		//{{AFX_DATA(CCalcDlg)
@@ -53,9 +65,9 @@ public:
 	int  GetMode() { return m_nMode; }
 	BOOL IsWorkingMode();// { return 2 == NBits(m_nMode); }
 	int  GetEditFlags();
-	//void Store(PLANE_TRAJ_ARR c);
-	//BOOL Load(const PLANE_TRAJ_ARR c);
-	void Restore(int nIndex);
+	void Store(PLANE_TRAJ_ARR c);
+	BOOL Load(const PLANE_TRAJ_ARR c);
+	//void Restore(int nIndex);
 	void SetTrajectoryType(int nTrajectoryType);
 	int GetTrajectoryType() { return m_nTrajectoryType; }
 	void SetHitAngle(float fHitAngle) { m_fHitAngle = fHitAngle; }
@@ -73,12 +85,12 @@ protected:
 	void SetMode(int nFlag, BOOL bEnable);
 	BOOL MakeChoice(int nFlag, float* fVal, float fBound, int nCount, BOOL bExcludeZero);
 	void SetReadOnly(int nID, BOOL bReadOnly);
-	void Return(BOOL bSave);
-	//void DDX_Text_Ex(CDataExchange* pDX, int nIDC, float& value, int nFlag,
+	//void Return(BOOL bSave);
+	void DDX_Text_Ex(CDataExchange* pDX, int nIDC, float& value, int nFlag);
 	//	EUCVariables eUnitType, int nUnitIDC);
 	void SetValidTrajectory(BOOL bValid);
 	void EnableButton(int nButtonID, int nSpinID, BOOL bEnable, BOOL bVisible);
-	//CTrajView* GetTrajView();
+	CTrajView* GetTrajView();
 
 	// Generated message map functions
 	//{{AFX_MSG(CCalcDlg)
@@ -100,7 +112,14 @@ protected:
 	afx_msg void OnButton6();
 	afx_msg void OnButton7();
 	afx_msg void OnButton8();
-	afx_msg void OnAddToClipbook();
+	afx_msg void OnJTraj();
+	afx_msg void OnExtendedJTraj();
+	afx_msg void OnSTraj();
+	afx_msg void OnExtendedSTraj();
+	afx_msg void OnUpdateJTraj(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateExtendedJTraj(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateSTraj(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateExtendedSTraj(CCmdUI* pCmdUI);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
@@ -114,15 +133,6 @@ private:
 	int   m_nMode;
 	int   m_nTrajectoryType;
 	float m_fHitAngle;
-
-	float	m_fPhi1;
-	float	m_fL1;
-	float	m_fBR1;
-	float	m_fPhi2;
-	float	m_fL2;
-	float	m_fBR2;
-	float	m_fPhi3;
-	float	m_fL3;
 
 
 // Implementation

@@ -36,6 +36,9 @@
     <ClInclude Include="PlaneTrajMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Trajview.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WellTrajectoryCalculator.cpp">
@@ -48,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PlaneTrajMath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Trajview.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
