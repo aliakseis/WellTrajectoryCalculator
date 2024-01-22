@@ -54,6 +54,26 @@ CCalcDlg::CCalcDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_2DDIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	m_fL1 = (float)100.0;
+	m_fPhi1 = (float)10.0;
+	m_fBR1 = (float)40.0;
+
+	m_fL2 = (float)100.0;
+	m_fPhi2 = (float)50.0;
+	m_fBR2 = (float)-50.0;
+
+	m_fL3 = (float)100.0;
+	m_fPhi3 = (float)0.0;
+
+	m_fTVD = (float)435.4;
+	m_fDisp = (float)183.89;
+
+	m_nMode = 0;
+	m_bValidTrajectory = FALSE;
+	m_bIsotropic = FALSE;
+	m_nTrajectoryType = tkExtendedSTrajectory;
+
 }
 
 void CCalcDlg::DoDataExchange(CDataExchange* pDX)

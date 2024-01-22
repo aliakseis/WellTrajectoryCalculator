@@ -6,6 +6,14 @@
 
 #include "PlaneTrajMath.h"
 
+enum
+{
+	tkJTrajectory = 0,
+	tkExtendedJTrajectory,
+	tkSTrajectory,
+	tkExtendedSTrajectory
+};
+
 // CWellTrajectoryCalculatorDlg dialog
 class CCalcDlg : public CDialogEx
 {
@@ -106,6 +114,15 @@ private:
 	int   m_nMode;
 	int   m_nTrajectoryType;
 	float m_fHitAngle;
+
+	float	m_fPhi1;
+	float	m_fL1;
+	float	m_fBR1;
+	float	m_fPhi2;
+	float	m_fL2;
+	float	m_fBR2;
+	float	m_fPhi3;
+	float	m_fL3;
 
 
 // Implementation
