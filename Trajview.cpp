@@ -135,6 +135,7 @@ BEGIN_MESSAGE_MAP(CTrajView, CWnd)
 	ON_WM_LBUTTONUP()
 	ON_WM_PAINT()
 	//}}AFX_MSG_MAP
+	ON_WM_NCHITTEST()
 END_MESSAGE_MAP()
 
 
@@ -774,3 +775,10 @@ int CTrajView::GetMarkerNumber()
 	}
 }
 
+
+
+LRESULT CTrajView::OnNcHitTest(CPoint point)
+{
+	// https://groups.google.com/g/microsoft.public.vc.mfc/c/fHJiQmwZpfk
+	return HTCLIENT;// CWnd::OnNcHitTest(point);
+}
