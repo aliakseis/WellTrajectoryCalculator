@@ -52,7 +52,6 @@ protected:
 	// Generated message map functions
 protected:
 	//{{AFX_MSG(CTrajView)
-	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);

@@ -128,7 +128,6 @@ void CTrajView::OnInitialUpdate()
 
 BEGIN_MESSAGE_MAP(CTrajView, CWnd)
 	//{{AFX_MSG_MAP(CTrajView)
-	ON_WM_SIZE()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_MOUSEMOVE()
 	ON_WM_SETCURSOR()
@@ -552,29 +551,6 @@ void CTrajView::OnPaint()
 /////////////////////////////////////////////////////////////////////////////
 // CTrajView message handlers
  
-void CTrajView::OnSize(UINT nType, int cx, int cy)
-{
-	__super::OnSize(nType, cx, cy);
-	/*
-	static bool bRecurs = false;
-	if(::IsWindow(m_CalcDlg.m_hWnd) && !bRecurs) 
-	{
-		CRect Rect1,Rect2;
-		GetWindowRect(&Rect1);
-		bRecurs = true;
-		m_CalcDlg.GetWindowRect(&Rect2);
-		m_CalcDlg.SetWindowPos(NULL, 0, 0, Rect2.Width(), Rect1.Height(),
-   						SWP_NOZORDER | SWP_NOACTIVATE );
-		GetParent()->ScreenToClient(&Rect1);
-		Rect1.left += Rect2.Width();
-//		m_CalcDlg.UpdateRect = Rect1;
-		SetWindowPos(NULL, Rect1.left, Rect1.top, Rect1.Width(), Rect1.Height(),
-   					SWP_NOZORDER | SWP_NOACTIVATE );
-		bRecurs = false;
-	}
-	*/
-}
-
 void CTrajView::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if(m_State == TVS_ONMARKER) {
