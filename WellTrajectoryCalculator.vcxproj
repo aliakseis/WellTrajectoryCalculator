@@ -208,9 +208,11 @@
     <ResourceCompile Include="WellTrajectoryCalculator.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="RES\NODROP.CUR" />
     <None Include="res\WellTrajectoryCalculator.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\bmp3d_de.bmp" />
     <Image Include="res\WellTrajectoryCalculator.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

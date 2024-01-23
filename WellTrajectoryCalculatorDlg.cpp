@@ -253,6 +253,12 @@ BOOL CCalcDlg::OnInitDialog()
 
     m_pView->SubclassDlgItem(IDC_TRAJECTORY_VIEW, this);
 
+	m_ToolBar.CreateEx(this);/*, TBSTYLE_FLAT, WS_CHILD |
+		WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS |
+		CBRS_FLYBY | CBRS_SIZE_DYNAMIC);*/
+	m_ToolBar.LoadToolBar(IDR_2D_DESIGN);
+	RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
+
 	m_Sensitivity.SetRange(0, 20, FALSE);
 	m_Sensitivity.SetPos(10);
 	m_Sensitivity.SetLineSize(1);

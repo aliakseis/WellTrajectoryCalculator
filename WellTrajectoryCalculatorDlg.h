@@ -143,6 +143,7 @@ private:
 	float m_fHitAngle;
 
     std::unique_ptr<CTrajView> m_pView;
+	CToolBar m_ToolBar;
 
 // Implementation
 protected:
