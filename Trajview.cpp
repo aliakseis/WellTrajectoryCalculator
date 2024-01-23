@@ -282,7 +282,8 @@ void CTrajView::OnPaint()
 {
 	if (!m_CalcDlg.m_bValidTrajectory)
 	{
-        __super::OnPaint();
+        //__super::OnPaint();
+        ValidateRect(NULL);
 		return;
 	}
 	CRect rect;
