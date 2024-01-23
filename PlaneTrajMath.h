@@ -38,20 +38,20 @@ public:
     double GetTVDError();
     double GetDispError();
 
-    BOOL FindSolution2x2();
+    bool FindSolution2x2();
     void FindAngle();
-    BOOL SimpleTrigonometric();
-    BOOL PuzzleTrigonometric();
+    bool SimpleTrigonometric();
+    bool PuzzleTrigonometric();
 
-    BOOL CalcLwhereR(int nFlags);
-    BOOL CalcLltR(int nFlags);
-    BOOL CalcLL(int nFlags);
-    BOOL CalcRR();
-    BOOL CalcLwherePhi(int nFlags);
-    BOOL CalcLltPhi(int nFlags);
-    BOOL CalcRwherePhi(int nFlags);
-    BOOL CalcRgtPhi(int nFlags);
-    BOOL CalcPhiPhi(int nFlags);
+    bool CalcLwhereR(int nFlags);
+    bool CalcLltR(int nFlags);
+    bool CalcLL(int nFlags);
+    bool CalcRR();
+    bool CalcLwherePhi(int nFlags);
+    bool CalcLltPhi(int nFlags);
+    bool CalcRwherePhi(int nFlags);
+    bool CalcRgtPhi(int nFlags);
+    bool CalcPhiPhi(int nFlags);
 
 private:
     PLANE_TRAJ_ARR& m_c;

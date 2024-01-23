@@ -17,7 +17,7 @@
 namespace
 {
 
-void EditLock(CWnd* pEdit, BOOL flLock)
+void EditLock(CWnd* pEdit, bool flLock)
 {
     enum
     {
@@ -44,17 +44,17 @@ void EditLock(CWnd* pEdit, BOOL flLock)
     }
 }
 
-BOOL EnableEdit(CWnd* Ctrl, BOOL flEnable)
+bool EnableEdit(CWnd* Ctrl, bool flEnable)
 {
     if (Ctrl)
         EditLock(Ctrl, !flEnable);
-    return TRUE;
+    return true;
 }
 
-void ShowControl(CWnd* pWnd, BOOL Show)
+void ShowControl(CWnd* pWnd, bool Show)
 {
     if (!pWnd)
-        ASSERT(FALSE);
+        ASSERT(false);
     else
     {
         int nCmdShow = Show ? SW_SHOWNA : SW_HIDE;
@@ -118,8 +118,8 @@ CCalcDlg::CCalcDlg(CWnd* pParent /*=nullptr*/) : CDialogEx(IDD_2DDIALOG, pParent
     m_fDisp = 183.89;
 
     m_nMode = 0;
-    m_bValidTrajectory = FALSE;
-    m_bIsotropic = FALSE;
+    m_bValidTrajectory = false;
+    m_bIsotropic = false;
     m_nTrajectoryType = tkExtendedSTrajectory;
 
     m_pView = std::make_unique<CTrajView>(*this);
@@ -133,7 +133,7 @@ void CCalcDlg::DDX_Text_Ex(CDataExchange* pDX, int nIDC, double& value, int nFla
     {
         if (!pDX->m_bSaveAndValidate)
         {
-            float v = value;
+            float v = static_cast<float>(value);
             DDX_Text(pDX, nIDC, v);
         }
         else
@@ -211,10 +211,10 @@ BOOL CCalcDlg::OnInitDialog()
     ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
     ASSERT(IDM_ABOUTBOX < 0xF000);
 
-    CMenu* pSysMenu = GetSystemMenu(FALSE);
+    CMenu* pSysMenu = GetSystemMenu(false);
     if (pSysMenu != nullptr)
     {
-        BOOL bNameValid;
+        bool bNameValid;
         CString strAboutMenu;
         bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
         ASSERT(bNameValid);
@@ -227,8 +227,8 @@ BOOL CCalcDlg::OnInitDialog()
 
     // Set the icon for this dialog.  The framework does this automatically
     //  when the application's main window is not a dialog
-    SetIcon(m_hIcon, TRUE);   // Set big icon
-    SetIcon(m_hIcon, FALSE);  // Set small icon
+    SetIcon(m_hIcon, true);   // Set big icon
+    SetIcon(m_hIcon, false);  // Set small icon
 
     // Add extra initialization here
 
@@ -238,15 +238,15 @@ BOOL CCalcDlg::OnInitDialog()
     m_ToolBar.LoadToolBar(IDR_2D_DESIGN);
     RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
 
-    m_Sensitivity.SetRange(0, 20, FALSE);
+    m_Sensitivity.SetRange(0, 20, false);
     m_Sensitivity.SetPos(10);
     m_Sensitivity.SetLineSize(1);
     m_Sensitivity.SetPageSize(10);
     m_Sensitivity.SetPos(10);
     if (m_bFixAngle)
     {
-        GetDlgItem(IDC_EDIT1)->EnableWindow(FALSE);
-        GetDlgItem(IDC_CHECK1)->EnableWindow(FALSE);
+        GetDlgItem(IDC_EDIT1)->EnableWindow(false);
+        GetDlgItem(IDC_CHECK1)->EnableWindow(false);
     }
     for (int i = IDC_SPIN1; i <= IDC_SPIN8; i++) ((CSpinButtonCtrl*)GetDlgItem(i))->SetRange(-1, 1);
 
@@ -255,11 +255,11 @@ BOOL CCalcDlg::OnInitDialog()
     {
         dlgtemplate.GetSizeInPixels(&m_minSize);
         CRect rect(0, 0, m_minSize.cx, m_minSize.cy);
-        AdjustWindowRectEx(&rect, GetStyle(), FALSE, GetExStyle());
+        AdjustWindowRectEx(&rect, GetStyle(), false, GetExStyle());
         m_minSize = rect.Size();
     }
 
-    return TRUE;  // return TRUE  unless you set the focus to a control
+    return true;  // return true  unless you set the focus to a control
 }
 
 void CCalcDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -326,9 +326,9 @@ int NBits(int nBits)
     return nCount;
 }
 
-void CCalcDlg::SetReadOnly(int nID, BOOL bReadOnly) { EnableEdit(GetDlgItem(nID), !bReadOnly); }
+void CCalcDlg::SetReadOnly(int nID, bool bReadOnly) { EnableEdit(GetDlgItem(nID), !bReadOnly); }
 
-void CCalcDlg::EnableButton(int nButtonID, int nSpinID, BOOL bEnable, BOOL bVisible)
+void CCalcDlg::EnableButton(int nButtonID, int nSpinID, bool bEnable, bool bVisible)
 {
     CWnd* pButton = GetDlgItem(nButtonID);
     CWnd* pSpin = GetDlgItem(nSpinID);
@@ -357,13 +357,13 @@ void CCalcDlg::EnableButton(int nButtonID, int nSpinID, BOOL bEnable, BOOL bVisi
     }
 }
 
-void CCalcDlg::EnableButtons(BOOL bEnable)
+void CCalcDlg::EnableButtons(bool bEnable)
 {
-    EnableButton(IDC_BUTTON1, IDC_SPIN1, bEnable && !(m_nMode & F_PHI1) && !m_bFixAngle, TRUE);
-    EnableButton(IDC_BUTTON2, IDC_SPIN2, bEnable && !(m_nMode & F_L1), TRUE);
-    EnableButton(IDC_BUTTON3, IDC_SPIN3, bEnable && !(m_nMode & F_R1), TRUE);
+    EnableButton(IDC_BUTTON1, IDC_SPIN1, bEnable && !(m_nMode & F_PHI1) && !m_bFixAngle, true);
+    EnableButton(IDC_BUTTON2, IDC_SPIN2, bEnable && !(m_nMode & F_L1), true);
+    EnableButton(IDC_BUTTON3, IDC_SPIN3, bEnable && !(m_nMode & F_R1), true);
 
-    EnableButton(IDC_BUTTON4, IDC_SPIN4, bEnable && !(m_nMode & F_PHI2), TRUE);
+    EnableButton(IDC_BUTTON4, IDC_SPIN4, bEnable && !(m_nMode & F_PHI2), true);
     EnableButton(IDC_BUTTON5, IDC_SPIN5, bEnable && !(m_nMode & F_L2), m_nTrajectoryType > tkJTrajectory);
     EnableButton(IDC_BUTTON6, IDC_SPIN6, bEnable && !(m_nMode & F_R2), m_nTrajectoryType > tkExtendedJTrajectory);
 
@@ -384,9 +384,9 @@ void CCalcDlg::EnableButtons(BOOL bEnable)
     SetReadOnly(IDC_EDIT8, /*bEnable &&*/ (m_nMode & F_L3));
 }
 
-void CCalcDlg::SetMode(int nFlag, BOOL bEnable)
+void CCalcDlg::SetMode(int nFlag, bool bEnable)
 {
-    UpdateData(TRUE);
+    UpdateData(true);
     if (bEnable)
     {
         m_nMode |= nFlag;
@@ -395,28 +395,28 @@ void CCalcDlg::SetMode(int nFlag, BOOL bEnable)
         {
             m_nMode = nFlag;
             if (nFlag != F_PHI1)
-                CheckDlgButton(IDC_CHECK1, FALSE);
+                CheckDlgButton(IDC_CHECK1, false);
             if (nFlag != F_L1)
-                CheckDlgButton(IDC_CHECK2, FALSE);
+                CheckDlgButton(IDC_CHECK2, false);
             if (nFlag != F_R1)
-                CheckDlgButton(IDC_CHECK3, FALSE);
+                CheckDlgButton(IDC_CHECK3, false);
             if (nFlag != F_PHI2)
-                CheckDlgButton(IDC_CHECK4, FALSE);
+                CheckDlgButton(IDC_CHECK4, false);
             if (nFlag != F_L2)
-                CheckDlgButton(IDC_CHECK5, FALSE);
+                CheckDlgButton(IDC_CHECK5, false);
             if (nFlag != F_R2)
-                CheckDlgButton(IDC_CHECK6, FALSE);
+                CheckDlgButton(IDC_CHECK6, false);
             if (nFlag != F_PHI3)
-                CheckDlgButton(IDC_CHECK7, FALSE);
+                CheckDlgButton(IDC_CHECK7, false);
             if (nFlag != F_L3)
-                CheckDlgButton(IDC_CHECK8, FALSE);
+                CheckDlgButton(IDC_CHECK8, false);
         }
     }
     else
         m_nMode &= ~nFlag;
     EnableButtons(NBits(m_nMode) == 2);
     if (!m_bValidTrajectory)
-        UpdateData(FALSE);
+        UpdateData(false);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -438,19 +438,19 @@ void CCalcDlg::OnCheck7() { SetMode(F_PHI3, IsDlgButtonChecked(IDC_CHECK7)); }
 
 void CCalcDlg::OnCheck8() { SetMode(F_L3, IsDlgButtonChecked(IDC_CHECK8)); }
 
-BOOL CheckData(const PLANE_TRAJ_ARR& c)
+bool CheckData(const PLANE_TRAJ_ARR& c)
 {
     if (c[0].L < 0 || c[1].L < 0 || c[2].L < 0 || c[0].L > MaxLen || c[1].L > MaxLen || c[2].L > MaxLen)
-        return FALSE;
+        return false;
     for (int i = 0; i < 2; i++)
     {
         double fAngle = c[i + 1].Phi - c[i].Phi;
         while (fAngle > M_PI) fAngle -= double(M_PI * 2);
         while (fAngle < -M_PI) fAngle += double(M_PI * 2);
         if (fAngle * c[i].R < 0)
-            return FALSE;
+            return false;
     }
-    return TRUE;
+    return true;
 }
 
 void CCalcDlg::Store(PLANE_TRAJ_ARR& c)
@@ -460,7 +460,7 @@ void CCalcDlg::Store(PLANE_TRAJ_ARR& c)
 
     if (m_bValidTrajectory || !(m_nMode & F_R1))
         if (m_fBR1 == 0.)
-            c[0].R = 0.f;  // return FALSE;
+            c[0].R = 0.f;  // return false;
         else
             c[0].R = Rad2Deg * 100 / m_fBR1;
     else
@@ -469,7 +469,7 @@ void CCalcDlg::Store(PLANE_TRAJ_ARR& c)
     c[1].Phi = m_fPhi2 * Deg2Rad;
     if (m_bValidTrajectory || !(m_nMode & F_R2))
         if (m_fBR2 == 0.)
-            c[1].R = 0.f;  // return FALSE;
+            c[1].R = 0.f;  // return false;
         else
             c[1].R = Rad2Deg * 100 / m_fBR2;
     else
@@ -479,7 +479,7 @@ void CCalcDlg::Store(PLANE_TRAJ_ARR& c)
     c[2].R = 0.f;
 }
 
-BOOL CCalcDlg::Load(const PLANE_TRAJ_ARR& c)
+bool CCalcDlg::Load(const PLANE_TRAJ_ARR& c)
 {
     double fBR1, fBR2;
     if (c[0].R != 0.)
@@ -491,7 +491,7 @@ BOOL CCalcDlg::Load(const PLANE_TRAJ_ARR& c)
     else
         fBR2 = 0.f;
     if (fabs(fBR1) > MaxRate || fabs(fBR2) > MaxRate)
-        return FALSE;
+        return false;
 
     m_fL1 = c[0].L;
     m_fPhi1 = c[0].Phi * Rad2Deg;
@@ -501,7 +501,7 @@ BOOL CCalcDlg::Load(const PLANE_TRAJ_ARR& c)
     m_fBR2 = fBR2;
     m_fL3 = c[2].L;
     m_fPhi3 = c[2].Phi * Rad2Deg;
-    return TRUE;
+    return true;
 }
 
 bool CCalcDlg::TryToApply()
@@ -509,18 +509,18 @@ bool CCalcDlg::TryToApply()
     PLANE_TRAJ_ARR c;
     if (m_fL1 < 0 || m_fL1 > MaxLen || fabs(m_fPhi1) > 180 || fabs(m_fBR1) > MaxRate || m_fL2 < 0 || m_fL2 > MaxLen ||
         fabs(m_fPhi2) > 180 || fabs(m_fBR2) > MaxRate || m_fL2 < 0 || m_fL2 > MaxLen || fabs(m_fPhi2) > 180)
-        return FALSE;
+        return false;
     /*
        c[0].L = m_fL1;
        c[0].Phi = m_fPhi1 * Deg2Rad;
 
        if(!(m_nMode & F_R1))
-              if(m_fBR1 == 0.) c[0].R = 0.f;//return FALSE;
+              if(m_fBR1 == 0.) c[0].R = 0.f;//return false;
             else c[0].R = Rad2Deg * 100 / m_fBR1;
        c[1].L = m_fL2;
        c[1].Phi = m_fPhi2 * Deg2Rad;
        if(!(m_nMode & F_R2))
-              if(m_fBR2 == 0.) c[1].R = 0.f;//return FALSE;
+              if(m_fBR2 == 0.) c[1].R = 0.f;//return false;
                else c[1].R = Rad2Deg * 100 / m_fBR2;
        c[2].L = m_fL3;
        c[2].Phi = m_fPhi3 * Deg2Rad;
@@ -529,7 +529,7 @@ bool CCalcDlg::TryToApply()
     Store(c);
     CPlaneTrajMath Math(c, m_fTVD, m_fDisp);
 
-    BOOL bCorrect = FALSE;
+    bool bCorrect = false;
     switch (m_nMode)
     {
     case F_L1 | F_R1:
@@ -626,14 +626,14 @@ bool CCalcDlg::TryToApply()
         break;
     }
     if (!bCorrect || !CheckData(c) || !Load(c))
-        return FALSE;
+        return false;
     /*
             double fBR1,fBR2;
             if(c[0].R != 0.) fBR1 = Rad2Deg * 100 / c[0].R;
             else fBR1 = 0.f;
             if(c[1].R != 0.) fBR2 = Rad2Deg * 100 / c[1].R;
             else fBR2 = 0.f;
-            if(fabs(fBR1) > MaxRate || fabs(fBR2) > MaxRate) return FALSE;
+            if(fabs(fBR1) > MaxRate || fabs(fBR2) > MaxRate) return false;
 
        m_fL1 = c[0].L;
        m_fPhi1 = c[0].Phi * Rad2Deg;
@@ -645,20 +645,20 @@ bool CCalcDlg::TryToApply()
        m_fPhi3 = c[2].Phi * Rad2Deg;
     */
     m_c = c;
-    SetValidTrajectory(TRUE);
-    //	UpdateData(FALSE);
-    //	GetDlgItem(IDOK)->EnableWindow(TRUE);
-    //	m_bValidTrajectory = TRUE;
+    SetValidTrajectory(true);
+    //	UpdateData(false);
+    //	GetDlgItem(IDOK)->EnableWindow(true);
+    //	m_bValidTrajectory = true;
     //	CWnd* pParent = GetParent();
     //	if(pParent) pParent->InvalidateRect(&UpdateRect);
-    EnableButtons(TRUE);
-    return TRUE;
+    EnableButtons(true);
+    return true;
 }
 
 void CCalcDlg::OnApply()
 {
     // TODO: Add your control notification handler code here
-    if (!UpdateData(TRUE))
+    if (!UpdateData(true))
         return;
     /*
        if(!(m_nMode & F_R1) && m_fBR1 == 0 ||
@@ -668,7 +668,7 @@ void CCalcDlg::OnApply()
     */
     if (!TryToApply())
     {
-        SetValidTrajectory(FALSE);
+        SetValidTrajectory(false);
         MessageBox(_T("Invalid data set."));
     }
     EnableButtons(NBits(m_nMode) == 2);
@@ -680,15 +680,15 @@ void CCalcDlg::OnIsotropic()
     m_pView->InvalidateRect(NULL);
 }
 
-BOOL CCalcDlg::MakeChoice(int nFlag, double* fVal, double fBound, int nCount, BOOL bExcludeZero)
+bool CCalcDlg::MakeChoice(int nFlag, double* fVal, double fBound, int nCount, bool bExcludeZero)
 {
-    if (2 != NBits(m_nMode) || m_nMode & nFlag || !UpdateData(TRUE))
-        return FALSE;
+    if (2 != NBits(m_nMode) || m_nMode & nFlag || !UpdateData(true))
+        return false;
     if (TryToApply())
-        return TRUE;
+        return true;
     double fStartVal = *fVal;
     fBound /= nCount;
-    BOOL bFind = FALSE;
+    bool bFind = false;
 
     SetCursor(LoadCursor(NULL, IDC_WAIT));
     for (int i = 1; i <= nCount; i++)
@@ -696,13 +696,13 @@ BOOL CCalcDlg::MakeChoice(int nFlag, double* fVal, double fBound, int nCount, BO
         *fVal = fStartVal - fBound * i;
         if (!(bExcludeZero && 0 == (*fVal)) && TryToApply())
         {
-            bFind = TRUE;
+            bFind = true;
             break;
         }
         *fVal = fStartVal + fBound * i;
         if (!(bExcludeZero && 0 == (*fVal)) && TryToApply())
         {
-            bFind = TRUE;
+            bFind = true;
             break;
         }
     }
@@ -711,7 +711,7 @@ BOOL CCalcDlg::MakeChoice(int nFlag, double* fVal, double fBound, int nCount, BO
     if (!bFind)
     {
         *fVal = fStartVal;
-        SetValidTrajectory(FALSE);
+        SetValidTrajectory(false);
         MessageBox(_T("Please try another parameter."));
     }
     return bFind;
@@ -719,55 +719,55 @@ BOOL CCalcDlg::MakeChoice(int nFlag, double* fVal, double fBound, int nCount, BO
 
 void CCalcDlg::OnButton1()
 {
-    if (!MakeChoice(F_PHI1, &m_fPhi1, 360., 2000, FALSE))
-        GetDlgItem(IDC_BUTTON1)->EnableWindow(FALSE);
+    if (!MakeChoice(F_PHI1, &m_fPhi1, 360., 2000, false))
+        GetDlgItem(IDC_BUTTON1)->EnableWindow(false);
 }
 
 void CCalcDlg::OnButton2()
 {
-    if (!MakeChoice(F_L1, &m_fL1, fmax(fabs(m_fTVD), fabs(m_fDisp)) * 2, 2000, FALSE))
-        GetDlgItem(IDC_BUTTON2)->EnableWindow(FALSE);
+    if (!MakeChoice(F_L1, &m_fL1, fmax(fabs(m_fTVD), fabs(m_fDisp)) * 2, 2000, false))
+        GetDlgItem(IDC_BUTTON2)->EnableWindow(false);
 }
 
 void CCalcDlg::OnButton3()
 {
-    if (!MakeChoice(F_R1, &m_fBR1, MaxRate * 2, 2000, TRUE))
-        GetDlgItem(IDC_BUTTON3)->EnableWindow(FALSE);
+    if (!MakeChoice(F_R1, &m_fBR1, MaxRate * 2, 2000, true))
+        GetDlgItem(IDC_BUTTON3)->EnableWindow(false);
 }
 
 void CCalcDlg::OnButton4()
 {
-    if (!MakeChoice(F_PHI2, &m_fPhi2, 360., 2000, FALSE))
-        GetDlgItem(IDC_BUTTON4)->EnableWindow(FALSE);
+    if (!MakeChoice(F_PHI2, &m_fPhi2, 360., 2000, false))
+        GetDlgItem(IDC_BUTTON4)->EnableWindow(false);
 }
 
 void CCalcDlg::OnButton5()
 {
-    if (!MakeChoice(F_L2, &m_fL2, fmax(fabs(m_fTVD), fabs(m_fDisp)) * 2, 2000, FALSE))
-        GetDlgItem(IDC_BUTTON5)->EnableWindow(FALSE);
+    if (!MakeChoice(F_L2, &m_fL2, fmax(fabs(m_fTVD), fabs(m_fDisp)) * 2, 2000, false))
+        GetDlgItem(IDC_BUTTON5)->EnableWindow(false);
 }
 
 void CCalcDlg::OnButton6()
 {
-    if (!MakeChoice(F_R2, &m_fBR2, MaxRate * 2, 2000, TRUE))
-        GetDlgItem(IDC_BUTTON6)->EnableWindow(FALSE);
+    if (!MakeChoice(F_R2, &m_fBR2, MaxRate * 2, 2000, true))
+        GetDlgItem(IDC_BUTTON6)->EnableWindow(false);
 }
 
 void CCalcDlg::OnButton7()
 {
-    if (!MakeChoice(F_PHI3, &m_fPhi3, 360., 2000, FALSE))
-        GetDlgItem(IDC_BUTTON7)->EnableWindow(FALSE);
+    if (!MakeChoice(F_PHI3, &m_fPhi3, 360., 2000, false))
+        GetDlgItem(IDC_BUTTON7)->EnableWindow(false);
 }
 
 void CCalcDlg::OnButton8()
 {
-    if (!MakeChoice(F_L3, &m_fL3, fmax(fabs(m_fTVD), fabs(m_fDisp)) * 2, 2000, FALSE))
-        GetDlgItem(IDC_BUTTON8)->EnableWindow(FALSE);
+    if (!MakeChoice(F_L3, &m_fL3, fmax(fabs(m_fTVD), fabs(m_fDisp)) * 2, 2000, false))
+        GetDlgItem(IDC_BUTTON8)->EnableWindow(false);
 }
 
 void CCalcDlg::OnCancel() { __super::OnCancel(); }
 
-BOOL CCalcDlg::IsWorkingMode() { return 2 == NBits(m_nMode); }
+bool CCalcDlg::IsWorkingMode() { return 2 == NBits(m_nMode); }
 
 int CCalcDlg::GetEditFlags()
 {
@@ -796,20 +796,20 @@ int CCalcDlg::GetEditFlags()
     return nFlags ^ m_nMode;
 }
 
-void CCalcDlg::SetValidTrajectory(BOOL bValid)
+void CCalcDlg::SetValidTrajectory(bool bValid)
 {
     GetDlgItem(IDOK)->EnableWindow(bValid);
     GetDlgItem(IDC_ADD_TO_CLIPBOOK)->EnableWindow(bValid);
     m_bValidTrajectory = bValid;
-    UpdateData(FALSE);
+    UpdateData(false);
     m_pView->InvalidateRect(NULL);
 }
 
 void CCalcDlg::SetTrajectoryType(int nTrajectoryType)
 {
-    UpdateData(TRUE);
+    UpdateData(true);
 
-    BOOL bInvalidate = nTrajectoryType < m_nTrajectoryType;
+    bool bInvalidate = nTrajectoryType < m_nTrajectoryType;
     if ((tkJTrajectory == nTrajectoryType || tkExtendedJTrajectory == nTrajectoryType) &&
         (tkSTrajectory == m_nTrajectoryType || tkExtendedSTrajectory == m_nTrajectoryType))
         m_fPhi2 = m_fHitAngle;
@@ -833,27 +833,27 @@ void CCalcDlg::SetTrajectoryType(int nTrajectoryType)
     {
         // No breaks
     case tkJTrajectory:
-        CheckDlgButton(IDC_CHECK5, FALSE);
-        ShowControl(GetDlgItem(IDC_EDIT5), FALSE);
-        ShowControl(GetDlgItem(IDC_CHECK5), FALSE);
-        //			ShowControl(GetDlgItem(IDC_BUTTON5), FALSE);
+        CheckDlgButton(IDC_CHECK5, false);
+        ShowControl(GetDlgItem(IDC_EDIT5), false);
+        ShowControl(GetDlgItem(IDC_CHECK5), false);
+        //			ShowControl(GetDlgItem(IDC_BUTTON5), false);
         m_nMode &= ~F_L2;
     case tkExtendedJTrajectory:
-        CheckDlgButton(IDC_CHECK6, FALSE);
-        CheckDlgButton(IDC_CHECK7, FALSE);
-        ShowControl(GetDlgItem(IDC_EDIT6), FALSE);
-        ShowControl(GetDlgItem(IDC_CHECK6), FALSE);
-        //			ShowControl(GetDlgItem(IDC_BUTTON6), FALSE);
-        ShowControl(GetDlgItem(IDC_EDIT7), FALSE);
-        ShowControl(GetDlgItem(IDC_CHECK7), FALSE);
-        //			ShowControl(GetDlgItem(IDC_BUTTON7), FALSE);
-        ShowControl(GetDlgItem(IDC_EDIT7Units), FALSE);
+        CheckDlgButton(IDC_CHECK6, false);
+        CheckDlgButton(IDC_CHECK7, false);
+        ShowControl(GetDlgItem(IDC_EDIT6), false);
+        ShowControl(GetDlgItem(IDC_CHECK6), false);
+        //			ShowControl(GetDlgItem(IDC_BUTTON6), false);
+        ShowControl(GetDlgItem(IDC_EDIT7), false);
+        ShowControl(GetDlgItem(IDC_CHECK7), false);
+        //			ShowControl(GetDlgItem(IDC_BUTTON7), false);
+        ShowControl(GetDlgItem(IDC_EDIT7Units), false);
         m_nMode &= ~(F_R2 | F_PHI3);
     case tkSTrajectory:
-        CheckDlgButton(IDC_CHECK8, FALSE);
-        ShowControl(GetDlgItem(IDC_EDIT8), FALSE);
-        ShowControl(GetDlgItem(IDC_CHECK8), FALSE);
-        //			ShowControl(GetDlgItem(IDC_BUTTON8), FALSE);
+        CheckDlgButton(IDC_CHECK8, false);
+        ShowControl(GetDlgItem(IDC_EDIT8), false);
+        ShowControl(GetDlgItem(IDC_CHECK8), false);
+        //			ShowControl(GetDlgItem(IDC_BUTTON8), false);
         m_nMode &= ~F_L3;
     case tkExtendedSTrajectory:
         break;
@@ -865,21 +865,21 @@ void CCalcDlg::SetTrajectoryType(int nTrajectoryType)
     {
         // No breaks
     case tkExtendedSTrajectory:
-        ShowControl(GetDlgItem(IDC_EDIT8), TRUE);
-        ShowControl(GetDlgItem(IDC_CHECK8), TRUE);
-        //			ShowControl(GetDlgItem(IDC_BUTTON8), TRUE);
+        ShowControl(GetDlgItem(IDC_EDIT8), true);
+        ShowControl(GetDlgItem(IDC_CHECK8), true);
+        //			ShowControl(GetDlgItem(IDC_BUTTON8), true);
     case tkSTrajectory:
-        ShowControl(GetDlgItem(IDC_EDIT6), TRUE);
-        ShowControl(GetDlgItem(IDC_CHECK6), TRUE);
-        //			ShowControl(GetDlgItem(IDC_BUTTON6), TRUE);
-        ShowControl(GetDlgItem(IDC_EDIT7), TRUE);
-        ShowControl(GetDlgItem(IDC_CHECK7), TRUE);
-        //			ShowControl(GetDlgItem(IDC_BUTTON7), TRUE);
-        ShowControl(GetDlgItem(IDC_EDIT7Units), TRUE);
+        ShowControl(GetDlgItem(IDC_EDIT6), true);
+        ShowControl(GetDlgItem(IDC_CHECK6), true);
+        //			ShowControl(GetDlgItem(IDC_BUTTON6), true);
+        ShowControl(GetDlgItem(IDC_EDIT7), true);
+        ShowControl(GetDlgItem(IDC_CHECK7), true);
+        //			ShowControl(GetDlgItem(IDC_BUTTON7), true);
+        ShowControl(GetDlgItem(IDC_EDIT7Units), true);
     case tkExtendedJTrajectory:
-        ShowControl(GetDlgItem(IDC_EDIT5), TRUE);
-        ShowControl(GetDlgItem(IDC_CHECK5), TRUE);
-        //			ShowControl(GetDlgItem(IDC_BUTTON5), TRUE);
+        ShowControl(GetDlgItem(IDC_EDIT5), true);
+        ShowControl(GetDlgItem(IDC_CHECK5), true);
+        //			ShowControl(GetDlgItem(IDC_BUTTON5), true);
     case tkJTrajectory:
         break;
     default:
@@ -887,9 +887,9 @@ void CCalcDlg::SetTrajectoryType(int nTrajectoryType)
     }
 
     if (bInvalidate)
-        SetValidTrajectory(FALSE);
+        SetValidTrajectory(false);
     else
-        UpdateData(FALSE);  // Show/hide labels; SetValidTrajectory() has such a line inside
+        UpdateData(false);  // Show/hide labels; SetValidTrajectory() has such a line inside
     EnableButtons(NBits(m_nMode) == 2);
 }
 
@@ -909,7 +909,7 @@ BOOL CCalcDlg::PreTranslateMessage(MSG* pMsg)
             {
                 OnVScroll(SB_THUMBPOSITION, (VK_UP == pMsg->wParam) ? 1 : -1,
                           static_cast<CScrollBar*>(CWnd::FromHandle(hWndNext)));
-                return TRUE;
+                return true;
             }
         }
     }
@@ -1011,7 +1011,7 @@ void CCalcDlg::OnAddToClipbook()
     Store(m_clip);
     m_fClipTVD = m_fTVD;
     m_fClipDisp = m_fDisp;
-    GetDlgItem(IDC_CLIPBOOK)->EnableWindow(TRUE);
+    GetDlgItem(IDC_CLIPBOOK)->EnableWindow(true);
 }
 
 void CCalcDlg::OnRestoreFromClipbook()
@@ -1021,6 +1021,6 @@ void CCalcDlg::OnRestoreFromClipbook()
         m_fTVD = m_fClipTVD;
         m_fDisp = m_fClipDisp;
         m_c = m_clip;
-        SetValidTrajectory(TRUE);
+        SetValidTrajectory(true);
     }
 }

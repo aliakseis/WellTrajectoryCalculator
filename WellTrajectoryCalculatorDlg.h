@@ -63,28 +63,28 @@ public:
     double m_fClipDisp;
     PLANE_TRAJ_ARR m_clip;
 
-    BOOL m_bValidTrajectory = FALSE;
-    BOOL m_bIsotropic = FALSE;
-    BOOL m_bFixAngle = FALSE;
+    bool m_bValidTrajectory = false;
+    bool m_bIsotropic = false;
+    bool m_bFixAngle = false;
 
     int GetMode() { return m_nMode; }
-    BOOL IsWorkingMode();
+    bool IsWorkingMode();
     int GetEditFlags();
     void Store(PLANE_TRAJ_ARR& c);
-    BOOL Load(const PLANE_TRAJ_ARR& c);
+    bool Load(const PLANE_TRAJ_ARR& c);
     void SetTrajectoryType(int nTrajectoryType);
     int GetTrajectoryType() { return m_nTrajectoryType; }
     void SetHitAngle(double fHitAngle) { m_fHitAngle = fHitAngle; }
 
     // Implementation
 protected:
-    void EnableButtons(BOOL bEnable);
-    void SetMode(int nFlag, BOOL bEnable);
-    BOOL MakeChoice(int nFlag, double* fVal, double fBound, int nCount, BOOL bExcludeZero);
-    void SetReadOnly(int nID, BOOL bReadOnly);
+    void EnableButtons(bool bEnable);
+    void SetMode(int nFlag, bool bEnable);
+    bool MakeChoice(int nFlag, double* fVal, double fBound, int nCount, bool bExcludeZero);
+    void SetReadOnly(int nID, bool bReadOnly);
     void DDX_Text_Ex(CDataExchange* pDX, int nIDC, double& value, int nFlag);
-    void SetValidTrajectory(BOOL bValid);
-    void EnableButton(int nButtonID, int nSpinID, BOOL bEnable, BOOL bVisible);
+    void SetValidTrajectory(bool bValid);
+    void EnableButton(int nButtonID, int nSpinID, bool bEnable, bool bVisible);
 
     // Generated message map functions
     //{{AFX_MSG(CCalcDlg)
@@ -139,7 +139,7 @@ protected:
     HICON m_hIcon;
 
     // Generated message map functions
-    virtual BOOL OnInitDialog();
+     BOOL OnInitDialog() override;
 
 public:
     afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);

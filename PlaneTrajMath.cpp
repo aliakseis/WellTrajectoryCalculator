@@ -92,15 +92,15 @@ double CPlaneTrajMath::GetDispError()
 //  D * x + E * y = F
 //  x => A    y => B
 
-BOOL CPlaneTrajMath::FindSolution2x2()
+bool CPlaneTrajMath::FindSolution2x2()
 {
     double fMod = fB * fD - fE * fA;
     if (fabs(fMod) < 1e-10)
-        return FALSE;
+        return false;
     double fBuf = (fB * fF - fC * fE) / fMod;
     fB = (fC * fD - fF * fA) / fMod;
     fA = fBuf;
-    return TRUE;
+    return true;
 }
 
 // B = C * sin(Phi) + D * cos(Phi)
@@ -123,15 +123,15 @@ void CPlaneTrajMath::FindAngle()
 //	E * x + F * sin(Phi) + G * cos(Phi) = H
 // Phi => A		x => B
 
-BOOL CPlaneTrajMath::SimpleTrigonometric()
+bool CPlaneTrajMath::SimpleTrigonometric()
 {
     double fLeft = fB * fE - fF * fA;
     if (fabs(fLeft) < 1e-10)
-        return FALSE;
+        return false;
     double fRight = fC * fE - fG * fA;
     double fArg = (fD * fE - fH * fA) / sqrt(fLeft * fLeft + fRight * fRight);
     if (fArg < -1 || fArg > 1)
-        return FALSE;
+        return false;
     double fBuf = atan2(fRight, fLeft);
     if (fBuf > -M_PI / 2)
         if (fBuf < M_PI / 2)
@@ -141,22 +141,22 @@ BOOL CPlaneTrajMath::SimpleTrigonometric()
     else
         fA = double(-M_PI - asin(fArg) - fBuf);
     fB = ((fC * fF - fG * fB) * cos(fA) + fH * fB - fD * fF) / fLeft;
-    return TRUE;
+    return true;
 }
 
 //	A * cos(Phi) - (x - B) * sin(Phi) + C * x = D
 // A * sin(Phi) + (x - B) * cos(Phi) - E * x = F
 // Phi => A 	x => B
 
-BOOL CPlaneTrajMath::PuzzleTrigonometric()
+bool CPlaneTrajMath::PuzzleTrigonometric()
 {
     double fLeft = fA * fC + fB * fE + fF;
     if (fabs(fLeft) < 1e-10)
-        return FALSE;
+        return false;
     double fRight = fD - fB * fC + fA * fE;
     double fArg = (fA + fD * fE + fF * fC) / sqrt(fLeft * fLeft + fRight * fRight);
     if (fArg < -1 || fArg > 1)
-        return FALSE;
+        return false;
     double fBuf = atan2(fRight, fLeft);
     double fAngle = asin(fArg) - fBuf;
     double fSin = sin(fAngle);
@@ -174,7 +174,7 @@ BOOL CPlaneTrajMath::PuzzleTrigonometric()
     else
         fB = (fD - fA * fCos - fB * fSin) / (fC - fSin);
     fA = fAngle;
-    return TRUE;
+    return true;
 }
 
 // Main Equations :
@@ -187,7 +187,7 @@ BOOL CPlaneTrajMath::PuzzleTrigonometric()
 //			L2 * sin2 + R2 * (cos2 - cos0)
 
 //	Find: L0, R0
-BOOL CPlaneTrajMath::CalcLwhereR(int nFlags)
+bool CPlaneTrajMath::CalcLwhereR(int nFlags)
 {
     Direct(nFlags);
 
@@ -197,7 +197,7 @@ BOOL CPlaneTrajMath::CalcLwhereR(int nFlags)
     fD = sin0;
     fE = cos0 - cos1;
     fF = m_fDisp - m_c[1].L * sin1 - m_c[1].R * (cos1 - cos2) - m_c[2].L * sin2 - m_c[2].R * (cos2 - cos0);
-    BOOL bResult = FindSolution2x2();
+    bool bResult = FindSolution2x2();
     if (bResult)
     {
         m_c[0].L = fA;
@@ -208,7 +208,7 @@ BOOL CPlaneTrajMath::CalcLwhereR(int nFlags)
 }
 
 // Find: L0, R1
-BOOL CPlaneTrajMath::CalcLltR(int nFlags)
+bool CPlaneTrajMath::CalcLltR(int nFlags)
 {
     Direct(nFlags);
 
@@ -218,7 +218,7 @@ BOOL CPlaneTrajMath::CalcLltR(int nFlags)
     fD = sin0;
     fE = cos1 - cos2;
     fF = m_fDisp - m_c[1].L * sin1 - m_c[0].R * (cos0 - cos1) - m_c[2].L * sin2 - m_c[2].R * (cos2 - cos0);
-    BOOL bResult = FindSolution2x2();
+    bool bResult = FindSolution2x2();
     if (bResult)
     {
         m_c[0].L = fA;
@@ -228,7 +228,7 @@ BOOL CPlaneTrajMath::CalcLltR(int nFlags)
     return bResult;
 }
 
-BOOL CPlaneTrajMath::CalcLL(int nFlags)
+bool CPlaneTrajMath::CalcLL(int nFlags)
 {
     Direct(nFlags);
 
@@ -238,7 +238,7 @@ BOOL CPlaneTrajMath::CalcLL(int nFlags)
     fD = sin0;
     fE = sin1;
     fF = m_fDisp - m_c[0].R * (cos0 - cos1) - m_c[1].R * (cos1 - cos2) - m_c[2].R * (cos2 - cos0) - m_c[2].L * sin2;
-    BOOL bResult = FindSolution2x2();
+    bool bResult = FindSolution2x2();
     if (bResult)
     {
         m_c[0].L = fA;
@@ -248,7 +248,7 @@ BOOL CPlaneTrajMath::CalcLL(int nFlags)
     return bResult;
 }
 
-BOOL CPlaneTrajMath::CalcRR()
+bool CPlaneTrajMath::CalcRR()
 {
     Direct(0);
     fA = sin1 - sin0;
@@ -258,7 +258,7 @@ BOOL CPlaneTrajMath::CalcRR()
     fE = cos1 - cos2;
     fF = m_fDisp - m_c[0].L * sin0 - m_c[1].L * sin1 - m_c[2].L * sin2;
 
-    BOOL bResult = FindSolution2x2();
+    bool bResult = FindSolution2x2();
     if (bResult)
     {
         m_c[0].R = fA;
@@ -268,7 +268,7 @@ BOOL CPlaneTrajMath::CalcRR()
 }
 
 //	Find: L0, Phi0
-BOOL CPlaneTrajMath::CalcLwherePhi(int nFlags)
+bool CPlaneTrajMath::CalcLwherePhi(int nFlags)
 {
     Direct(nFlags);
 
@@ -278,7 +278,7 @@ BOOL CPlaneTrajMath::CalcLwherePhi(int nFlags)
 
     double fArg = fB / sqrt(fC * fC + fD * fD);
     if (fabs(fArg) > 1.)
-        return FALSE;
+        return false;
     double fBuf = atan2(fD, fC);
 
     double fPhi[2], fL[2], fTVDErr[2], fDispErr[2];
@@ -307,16 +307,16 @@ BOOL CPlaneTrajMath::CalcLwherePhi(int nFlags)
     fTVDErr[1] = GetTVDError();
     fDispErr[1] = GetDispError();
 
-    //   if((fTVDErr[1]>fTVDErr[0])^(fDispErr[1]>fDispErr[0])) return FALSE;
+    //   if((fTVDErr[1]>fTVDErr[0])^(fDispErr[1]>fDispErr[0])) return false;
     if (fL[1] < 0 || (fTVDErr[1] > fTVDErr[0]) && (fDispErr[1] > fDispErr[0]) && fL[0] >= 0)
     {
         if (fTVDErr[0] > 0.1 || fDispErr[0] > 0.1)
-            return FALSE;
+            return false;
         m_c[0].Phi = fPhi[0];
         m_c[0].L = fL[0];
     }
     else if (fTVDErr[1] > 0.1 || fDispErr[1] > 0.1)
-        return FALSE;
+        return false;
 
     /*
             if(fBuf > -M_PI/2)
@@ -331,11 +331,11 @@ BOOL CPlaneTrajMath::CalcLwherePhi(int nFlags)
                     m_c[0].L = (-fD + fB * cos(fA)) / sin(fA);
     */
     Inverse(nFlags);
-    return TRUE;
+    return true;
 }
 
 //	Find: L0, Phi1
-BOOL CPlaneTrajMath::CalcLltPhi(int nFlags)
+bool CPlaneTrajMath::CalcLltPhi(int nFlags)
 {
     Direct(nFlags);
 
@@ -347,7 +347,7 @@ BOOL CPlaneTrajMath::CalcLltPhi(int nFlags)
     fF = m_c[1].L;
     fG = -m_c[0].R + m_c[1].R;
     fH = m_fDisp - m_c[0].R * cos0 + m_c[1].R * cos2 - m_c[2].L * sin2 - m_c[2].R * (cos2 - cos0);
-    BOOL bResult = SimpleTrigonometric();
+    bool bResult = SimpleTrigonometric();
     if (bResult)
     {
         m_c[1].Phi = fA;
@@ -367,7 +367,7 @@ BOOL CPlaneTrajMath::CalcLltPhi(int nFlags)
 //			L2 * sin2 + R2 * (cos2 - cos0)
 
 //	Find: R0, Phi0
-BOOL CPlaneTrajMath::CalcRwherePhi(int nFlags)
+bool CPlaneTrajMath::CalcRwherePhi(int nFlags)
 {
     Direct(nFlags);
 
@@ -378,7 +378,7 @@ BOOL CPlaneTrajMath::CalcRwherePhi(int nFlags)
     fE = cos1;
     fF = m_fDisp - m_c[1].L * sin1 - m_c[1].R * (cos1 - cos2) - m_c[2].L * sin2 - m_c[2].R * cos2;
 
-    BOOL bResult = PuzzleTrigonometric();
+    bool bResult = PuzzleTrigonometric();
     if (bResult)
     {
         m_c[0].Phi = fA;
@@ -389,7 +389,7 @@ BOOL CPlaneTrajMath::CalcRwherePhi(int nFlags)
 }
 
 //	Find: R1, Phi0
-BOOL CPlaneTrajMath::CalcRgtPhi(int nFlags)
+bool CPlaneTrajMath::CalcRgtPhi(int nFlags)
 {
     Direct(nFlags);
 
@@ -402,7 +402,7 @@ BOOL CPlaneTrajMath::CalcRgtPhi(int nFlags)
     fG = m_c[0].R - m_c[2].R;
     fH = m_fDisp - m_c[1].L * sin1 + m_c[0].R * cos1 - m_c[2].L * sin2 - m_c[2].R * cos2;
 
-    BOOL bResult = SimpleTrigonometric();
+    bool bResult = SimpleTrigonometric();
     if (bResult)
     {
         m_c[0].Phi = fA;
@@ -425,7 +425,7 @@ BOOL CPlaneTrajMath::CalcRgtPhi(int nFlags)
 //	A * cos(Phi0) + B * sin(Phi0) + C * cos(Phi1) + D * sin(Phi1) = F
 
 //	Find: Phi0, Phi1
-BOOL CPlaneTrajMath::CalcPhiPhi(int nFlags)
+bool CPlaneTrajMath::CalcPhiPhi(int nFlags)
 {
     int i;
     Direct(nFlags);
@@ -441,10 +441,10 @@ BOOL CPlaneTrajMath::CalcPhiPhi(int nFlags)
     double fArg =
         (fE * fE + fF * fF - fA * fA - fB * fB - fC * fC - fD * fD) / 2. / sqrt(fLeft * fLeft + fRight * fRight);
     if (fabs(fArg) > 1)
-        return FALSE;
+        return false;
     fArg = asin(fArg);
     double fAtan = atan2(fRight, fLeft);
-    BOOL bResult = FALSE;
+    bool bResult = false;
     for (i = 0; i < 2; i++)
     {
         double fDelta = -GetRoot(fArg, fAtan, i);
@@ -475,7 +475,7 @@ BOOL CPlaneTrajMath::CalcPhiPhi(int nFlags)
             cos1 = cos(m_c[1].Phi);
             if (GetTVDError() < 0.1 && GetDispError() < 0.1)
             {
-                bResult = TRUE;
+                bResult = true;
                 goto L1;
             }
         }

@@ -56,7 +56,7 @@ void DrawMarker(CDC* pDC, CPoint Point)
     pDC->Rectangle(&rect);
 }
 
-BOOL IsMarkerHere(CPoint Marker, CPoint Mouse)
+bool IsMarkerHere(CPoint Marker, CPoint Mouse)
 {
     return (Mouse.x >= Marker.x - 4 && Mouse.x <= Marker.x + 4 && Mouse.y >= Marker.y - 4 && Mouse.y <= Marker.y + 4);
 }
@@ -150,16 +150,16 @@ void CTrajView::DrawAxes(CDC* pDC)
     pDC->Polyline(Line, 2);
 }
 
-BOOL FitEllipseRect(CRect& rect)
+bool FitEllipseRect(CRect& rect)
 {
     rect.NormalizeRect();
     int nWidth = rect.Width();
     int nHeight = rect.Height();
     if (nWidth < 3 || nHeight < 3)
-        return FALSE;
+        return false;
     if (nWidth > 32766)
         if (nHeight > 32766)
-            return FALSE;
+            return false;
         else
         {
             if (abs(rect.right) > abs(rect.left))
@@ -180,7 +180,7 @@ BOOL FitEllipseRect(CRect& rect)
         rect.left += nDelta;
         rect.right -= nDelta;
     }
-    return TRUE;
+    return true;
 }
 
 const auto Epsilon = 1.e-6f;
@@ -387,21 +387,21 @@ void CTrajView::OnPaint()
                     double fAngle = m_CalcDlg.m_c[i + 1].Phi - m_CalcDlg.m_c[i].Phi;
                     while (fAngle > M_PI) fAngle -= (2 * M_PI);
                     while (fAngle < -M_PI) fAngle += (2 * M_PI);
-                    BOOL bIsHalfTurn = (fAngle * fR < 0);
-                    BOOL bExtendX = FALSE;
-                    BOOL bExtendY = FALSE;
+                    bool bIsHalfTurn = (fAngle * fR < 0);
+                    bool bExtendX = false;
+                    bool bExtendY = false;
                     int nMayBeLoop = 0;
                     if (sin0 <= 0 && sin1 >= 0)
                     {
                         fXmin = fmin(fXmin, fX - fRabs);
                         if (bIsHalfTurn)
-                            bExtendY = TRUE;
+                            bExtendY = true;
                     }
                     else if (sin0 >= 0 && sin1 <= 0)
                     {
                         fXmax = fmax(fXmax, fX + fRabs);
                         if (bIsHalfTurn)
-                            bExtendY = TRUE;
+                            bExtendY = true;
                     }
                     else
                         nMayBeLoop++;
@@ -410,13 +410,13 @@ void CTrajView::OnPaint()
                     {
                         fYmin = fmin(fYmin, fY - fRabs);
                         if (bIsHalfTurn)
-                            bExtendX = TRUE;
+                            bExtendX = true;
                     }
                     else if (cos0 >= 0 && cos1 <= 0)
                     {
                         fYmax = fmax(fYmax, fY + fRabs);
                         if (bIsHalfTurn)
-                            bExtendX = TRUE;
+                            bExtendX = true;
                     }
                     else
                         nMayBeLoop++;
@@ -452,7 +452,7 @@ void CTrajView::OnPaint()
 
                 if (bDraw && m_CalcDlg.m_c[i + 1].Phi != m_CalcDlg.m_c[i].Phi && Line[0] != Line[1] && fR != 0)
                 {
-                    BOOL bArcOK = FitEllipseRect(bound);
+                    bool bArcOK = FitEllipseRect(bound);
                     if (bArcOK)
                         if (fR < 0)
                             bArcOK = pDC->Arc(bound, Line[0], Line[1]);
@@ -527,7 +527,7 @@ void CTrajView::OnMouseMove(UINT nFlags, CPoint point)
     double fSaveL, fSaveBR, fSavePhi;
     if (m_CalcDlg.IsWorkingMode() && m_CalcDlg.m_bValidTrajectory)
     {
-        BOOL bOnMarker = FALSE;
+        bool bOnMarker = false;
         for (nMarker = 0; nMarker < GetMarkerNumber(); nMarker++)
         {
             switch (nMarker)
@@ -555,7 +555,7 @@ void CTrajView::OnMouseMove(UINT nFlags, CPoint point)
             }
             if (IsMarkerHere(m_Markers[nMarker].Point, point))
             {
-                bOnMarker = TRUE;
+                bOnMarker = true;
                 break;
             }
         }
@@ -598,7 +598,7 @@ void CTrajView::OnMouseMove(UINT nFlags, CPoint point)
             const auto fCoeffL = 1.;
             const auto fCoeffBR = 1.;
 
-            BOOL bAllowed = TRUE;
+            bool bAllowed = true;
             switch (m_nMarker)
             {
             case 0:
@@ -612,7 +612,7 @@ void CTrajView::OnMouseMove(UINT nFlags, CPoint point)
                 {
                     m_CalcDlg.m_fPhi1 = fSavePhi;
                     m_CalcDlg.m_fL1 = fSaveL;
-                    bAllowed = FALSE;
+                    bAllowed = false;
                 }
                 break;
             case 1:
@@ -621,7 +621,7 @@ void CTrajView::OnMouseMove(UINT nFlags, CPoint point)
                 if (!m_CalcDlg.TryToApply())
                 {
                     m_CalcDlg.m_fBR1 = fSaveBR;
-                    bAllowed = FALSE;
+                    bAllowed = false;
                 }
                 break;
             case 2:
@@ -635,7 +635,7 @@ void CTrajView::OnMouseMove(UINT nFlags, CPoint point)
                 {
                     m_CalcDlg.m_fPhi2 = fSavePhi;
                     m_CalcDlg.m_fL2 = fSaveL;
-                    bAllowed = FALSE;
+                    bAllowed = false;
                 }
                 break;
             case 3:
@@ -644,7 +644,7 @@ void CTrajView::OnMouseMove(UINT nFlags, CPoint point)
                 if (!m_CalcDlg.TryToApply())
                 {
                     m_CalcDlg.m_fBR2 = fSaveBR;
-                    bAllowed = FALSE;
+                    bAllowed = false;
                 }
                 break;
             case 4:
@@ -658,7 +658,7 @@ void CTrajView::OnMouseMove(UINT nFlags, CPoint point)
                 {
                     m_CalcDlg.m_fPhi3 = fSavePhi;
                     m_CalcDlg.m_fL3 = fSaveL;
-                    bAllowed = FALSE;
+                    bAllowed = false;
                 }
                 break;
             }
@@ -677,7 +677,7 @@ BOOL CTrajView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
     if (m_State == TVS_ONMARKER)
     {
         SetCursor(LoadCursor(NULL, IDC_CROSS));
-        return TRUE;
+        return true;
     }
     return __super::OnSetCursor(pWnd, nHitTest, message);
 }
@@ -725,5 +725,5 @@ BOOL CTrajView::OnEraseBkgnd(CDC* pDC)
     GetClientRect(&rect);
     pDC->PatBlt(rect.left, rect.top, rect.Width(), rect.Height(), PATCOPY);
     pDC->SelectObject(pPrevBrush);
-    return TRUE;
+    return true;
 }
