@@ -517,7 +517,7 @@ void CCalcDlg::OnCheck8()
 }
 
 
-BOOL CheckData(PLANE_TRAJ_ARR c)
+BOOL CheckData(const PLANE_TRAJ_ARR& c)
 {
 	if (c[0].L < 0 || c[1].L < 0 || c[2].L < 0 ||
 		c[0].L > MaxLen || c[1].L > MaxLen || c[2].L > MaxLen) return FALSE;

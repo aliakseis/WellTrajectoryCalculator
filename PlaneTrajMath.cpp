@@ -4,7 +4,7 @@
 ////////////////////////////////////////////////
 //	Math methods
 
-void Turn(PLANE_TRAJ_ARR m_c)
+void Turn(PLANE_TRAJ_ARR& m_c)
 {
 	float
 	fBuf = m_c[0].L;
@@ -18,7 +18,7 @@ void Turn(PLANE_TRAJ_ARR m_c)
 	m_c[1].R = -fBuf;
 }
 
-void RotateDown(PLANE_TRAJ_ARR m_c)
+void RotateDown(PLANE_TRAJ_ARR& m_c)
 {
    PLANE_TRAJ_CELL
    Buf = m_c[2];
@@ -27,7 +27,7 @@ void RotateDown(PLANE_TRAJ_ARR m_c)
    m_c[0] = Buf;
 }
 
-void RotateUp(PLANE_TRAJ_ARR m_c)
+void RotateUp(PLANE_TRAJ_ARR& m_c)
 {
    PLANE_TRAJ_CELL
    Buf = m_c[0];
