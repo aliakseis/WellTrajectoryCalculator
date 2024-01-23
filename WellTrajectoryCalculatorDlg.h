@@ -70,8 +70,8 @@ public:
 	int  GetMode() { return m_nMode; }
 	BOOL IsWorkingMode();// { return 2 == NBits(m_nMode); }
 	int  GetEditFlags();
-	void Store(PLANE_TRAJ_ARR c);
-	BOOL Load(const PLANE_TRAJ_ARR c);
+	void Store(PLANE_TRAJ_ARR& c);
+	BOOL Load(const PLANE_TRAJ_ARR& c);
 	//void Restore(int nIndex);
 	void SetTrajectoryType(int nTrajectoryType);
 	int GetTrajectoryType() { return m_nTrajectoryType; }

@@ -531,7 +531,7 @@ BOOL CheckData(PLANE_TRAJ_ARR c)
 }
 
 
-void CCalcDlg::Store(PLANE_TRAJ_ARR c)
+void CCalcDlg::Store(PLANE_TRAJ_ARR& c)
 {
 	c[0].L = m_fL1;
 	c[0].Phi = m_fPhi1 * Deg2Rad;
@@ -551,7 +551,7 @@ void CCalcDlg::Store(PLANE_TRAJ_ARR c)
 	c[2].R = 0.f;
 }
 
-BOOL CCalcDlg::Load(const PLANE_TRAJ_ARR c)
+BOOL CCalcDlg::Load(const PLANE_TRAJ_ARR& c)
 {
 	float fBR1, fBR2;
 	if (c[0].R != 0.) fBR1 = Rad2Deg * 100 / c[0].R;
@@ -597,8 +597,7 @@ bool CCalcDlg::TryToApply()
 	   c[2].R = 0.f;
 	*/
 	Store(c);
-	CPlaneTrajMath Math;
-	Math.SetData(c, m_fTVD, m_fDisp);
+	CPlaneTrajMath Math(c, m_fTVD, m_fDisp);
 
 	BOOL bCorrect = FALSE;
 	switch (m_nMode) {
@@ -686,7 +685,7 @@ bool CCalcDlg::TryToApply()
 	   m_fL3 = c[2].L;
 	   m_fPhi3 = c[2].Phi * Rad2Deg;
 	*/
-	memcpy(m_c, c, sizeof(PLANE_TRAJ_ARR));
+	m_c = c;
 	SetValidTrajectory(TRUE);
 	//	UpdateData(FALSE);
 	//	GetDlgItem(IDOK)->EnableWindow(TRUE);

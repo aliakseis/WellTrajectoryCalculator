@@ -37,13 +37,6 @@ void RotateUp(PLANE_TRAJ_ARR m_c)
 }
 
 
-void CPlaneTrajMath::SetData(PLANE_TRAJ_ARR c, float fTVD, float fDisp)
-{
-	m_c = c;
-	m_fTVD = fTVD;
-	m_fDisp = fDisp;
-}
-
 void CPlaneTrajMath::Direct(int nFlags)
 {
 	ASSERT(m_c[2].R == 0);
