@@ -280,8 +280,6 @@ const auto Epsilon = 1.e-6f;
 
 void CTrajView::OnPaint()
 {
-	int i;
-
 	if(!m_CalcDlg.m_bValidTrajectory) return;
 	CRect rect;
 //	m_CalcDlg.GetWindowRect(rect);
@@ -362,7 +360,7 @@ void CTrajView::OnPaint()
 
 			int nScaleLeft, nScaleRight,
 				 nScaleTop, nScaleBottom;
-			for(i = 1;; i++)
+			for(int i = 1;; i++)
 			{
 				int x = int(fOffsetX + fStepX * fCoeffX * i);
 				if(x > rect.right)
@@ -376,7 +374,7 @@ void CTrajView::OnPaint()
 				}
 			}
 
-			for(i = 1;; i++)
+			for(int i = 1;; i++)
 			{
 				int y = int(fOffsetY + fStepY * fCoeffY * i);
 				if(y > rect.bottom)
@@ -446,7 +444,7 @@ void CTrajView::OnPaint()
 
 		Line[0].x = (int)(rect.left +fX * fCoeffX);
 	   Line[0].y = (int)(rect.top + fY * fCoeffY);
-	   for(i = 0; i < 3; i++) 
+	   for(int i = 0; i < 3; i++) 
 		{
 	   	float sin0 = (float)sin(m_CalcDlg.m_c[i].Phi);
 	   	float cos0 = (float)cos(m_CalcDlg.m_c[i].Phi);
@@ -546,7 +544,7 @@ void CTrajView::OnPaint()
    if(m_State != TVS_DRAGGING) {
 		m_fCoeffX = fCoeffX;
 		m_fCoeffY = fCoeffY;
-   	for(i = 0; i < GetMarkerNumber(); i++) 
+   	for(int i = 0; i < GetMarkerNumber(); i++) 
 			DrawMarker(pDC, m_Markers[i].Point);
    }
 }
