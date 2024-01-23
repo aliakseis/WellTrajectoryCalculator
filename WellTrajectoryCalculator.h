@@ -5,11 +5,10 @@
 #pragma once
 
 #ifndef __AFXWIN_H__
-	#error "include 'pch.h' before including this file for PCH"
+#error "include 'pch.h' before including this file for PCH"
 #endif
 
-#include "resource.h"		// main symbols
-
+#include "resource.h"  // main symbols
 
 // CWellTrajectoryCalculatorApp:
 // See WellTrajectoryCalculator.cpp for the implementation of this class
@@ -18,15 +17,15 @@
 class CWellTrajectoryCalculatorApp : public CWinApp
 {
 public:
-	CWellTrajectoryCalculatorApp();
+    CWellTrajectoryCalculatorApp();
 
-// Overrides
+    // Overrides
 public:
-	virtual BOOL InitInstance();
+    virtual BOOL InitInstance();
 
-// Implementation
+    // Implementation
 
-	DECLARE_MESSAGE_MAP()
+    DECLARE_MESSAGE_MAP()
 };
 
 extern CWellTrajectoryCalculatorApp theApp;
