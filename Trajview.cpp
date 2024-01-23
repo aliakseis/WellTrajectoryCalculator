@@ -136,6 +136,7 @@ BEGIN_MESSAGE_MAP(CTrajView, CWnd)
 	ON_WM_PAINT()
 	//}}AFX_MSG_MAP
 	ON_WM_NCHITTEST()
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 
@@ -781,4 +782,16 @@ LRESULT CTrajView::OnNcHitTest(CPoint point)
 {
 	// https://groups.google.com/g/microsoft.public.vc.mfc/c/fHJiQmwZpfk
 	return HTCLIENT;// CWnd::OnNcHitTest(point);
+}
+
+
+BOOL CTrajView::OnEraseBkgnd(CDC* pDC)
+{
+	auto pPrevBrush = pDC->SelectObject(GetStockObject(WHITE_BRUSH));
+	CRect rect;
+	GetClientRect(&rect);
+	pDC->PatBlt(rect.left, rect.top, rect.Width(), rect.Height(),
+		PATCOPY);
+	pDC->SelectObject(pPrevBrush);
+	return TRUE;
 }

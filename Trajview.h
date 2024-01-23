@@ -62,6 +62,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg LRESULT OnNcHitTest(CPoint point);
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 };
 
 
