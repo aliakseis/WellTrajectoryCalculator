@@ -170,7 +170,8 @@ void CTrajView::DrawAxes(CDC* pDC)
 {
    CPoint Line[2];
 	int nFlag;
-   if(m_State != TVS_DRAGGING) return;
+   if(m_State != TVS_DRAGGING)
+	   return;
 	float fNorm = 160.f / (float)sqrt(fsqr(m_fCoeffY * m_fCos) + fsqr(m_fCoeffX * m_fSin));
 
 	switch(m_nMarker) {
@@ -279,7 +280,11 @@ const auto Epsilon = 1.e-6f;
 
 void CTrajView::OnPaint()
 {
-	if(!m_CalcDlg.m_bValidTrajectory) return;
+	if (!m_CalcDlg.m_bValidTrajectory)
+	{
+        __super::OnPaint();
+		return;
+	}
 	CRect rect;
 //	m_CalcDlg.GetWindowRect(rect);
 //	int nDlgWidth = rect.Width();
