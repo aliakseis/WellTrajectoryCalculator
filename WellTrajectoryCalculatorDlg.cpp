@@ -130,7 +130,15 @@ CCalcDlg::~CCalcDlg() = default;
 void CCalcDlg::DDX_Text_Ex(CDataExchange* pDX, int nIDC, double& value, int nFlag)
 {
     if (!(m_nMode & nFlag) || m_bValidTrajectory)
-        DDX_Text(pDX, nIDC, value);
+    {
+        if (!pDX->m_bSaveAndValidate)
+        {
+            float v = value;
+            DDX_Text(pDX, nIDC, v);
+        }
+        else
+            DDX_Text(pDX, nIDC, value);
+    }
     else if (!pDX->m_bSaveAndValidate)
         GetDlgItem(nIDC)->SetWindowText(_T(""));
 }
