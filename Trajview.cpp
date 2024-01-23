@@ -664,9 +664,9 @@ void CTrajView::OnMouseMove(UINT nFlags, CPoint point)
 //			      float fTrans =x * m_fCos / m_fCoeffX - 
 //			      				  y * m_fSin / m_fCoeffY;
 
-#define fCoeffPhi (float)0.5
-#define fCoeffL   (float)1.
-#define fCoeffBR  (float)1.
+				  const auto fCoeffPhi = (float)0.5;
+				  const auto fCoeffL = (float)1.;
+				  const auto fCoeffBR = (float)1.;
 
 					BOOL bAllowed = TRUE;
 		         switch(m_nMarker) 
