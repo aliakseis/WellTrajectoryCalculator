@@ -192,6 +192,8 @@ BEGIN_MESSAGE_MAP(CCalcDlg, CDialogEx)
 	ON_UPDATE_COMMAND_UI(IDM_EXT_S_TRAJ, OnUpdateExtendedSTraj)
 	ON_WM_VSCROLL()
 	ON_WM_GETMINMAXINFO()
+	ON_BN_CLICKED(IDC_ADD_TO_CLIPBOOK, &CCalcDlg::OnAddToClipbook)
+	ON_BN_CLICKED(IDC_CLIPBOOK, &CCalcDlg::OnRestoreFromClipbook)
 END_MESSAGE_MAP()
 
 
@@ -671,7 +673,7 @@ void CCalcDlg::OnApply()
 void CCalcDlg::OnIsotropic()
 {
 	m_bIsotropic = IsDlgButtonChecked(IDC_Isotropic);
-	m_pView->InvalidateRect(NULL);//&UpdateRect);
+	m_pView->InvalidateRect(NULL);
 }
 
 BOOL CCalcDlg::MakeChoice(int nFlag, float* fVal, float fBound, int nCount, BOOL bExcludeZero)
@@ -700,7 +702,6 @@ BOOL CCalcDlg::MakeChoice(int nFlag, float* fVal, float fBound, int nCount, BOOL
 	return bFind;
 }
 
-//inline float fmax(double a, double b) {return(float)( (a > b)? a : b ); }
 
 void CCalcDlg::OnButton1()
 {
@@ -989,5 +990,26 @@ void CCalcDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	{
 		lpMMI->ptMinTrackSize.x = m_minSize.cx;
 		lpMMI->ptMinTrackSize.y = m_minSize.cy;
+	}
+}
+
+
+void CCalcDlg::OnAddToClipbook()
+{
+	Store(m_clip);
+	m_fClipTVD = m_fTVD;
+	m_fClipDisp = m_fDisp;
+	GetDlgItem(IDC_CLIPBOOK)->EnableWindow(TRUE);
+}
+
+
+void CCalcDlg::OnRestoreFromClipbook()
+{
+	if (Load(m_clip))
+	{
+		m_fTVD = m_fClipTVD;
+		m_fDisp = m_fClipDisp;
+		m_c = m_clip;
+		SetValidTrajectory(TRUE);
 	}
 }

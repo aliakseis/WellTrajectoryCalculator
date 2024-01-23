@@ -52,15 +52,21 @@ public:
 
 
 	CSliderCtrl	m_Sensitivity;
+
 	float	m_fTVD;
 	float	m_fDisp;
 	PLANE_TRAJ_ARR m_c;
+
+	float	m_fClipTVD;
+	float	m_fClipDisp;
+	PLANE_TRAJ_ARR m_clip;
+
 	BOOL m_bValidTrajectory = FALSE;
 	BOOL m_bIsotropic = FALSE;
 	BOOL m_bFixAngle = FALSE;
 
 	int  GetMode() { return m_nMode; }
-	BOOL IsWorkingMode();// { return 2 == NBits(m_nMode); }
+	BOOL IsWorkingMode();
 	int  GetEditFlags();
 	void Store(PLANE_TRAJ_ARR& c);
 	BOOL Load(const PLANE_TRAJ_ARR& c);
@@ -135,4 +141,6 @@ protected:
 	virtual BOOL OnInitDialog();
 public:
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
+	afx_msg void OnAddToClipbook();
+	afx_msg void OnRestoreFromClipbook();
 };
