@@ -4,6 +4,8 @@
 ////////////////////////////////////////////////
 //	Math methods
 
+namespace {
+
 void Turn(PLANE_TRAJ_ARR& m_c)
 {
 	float
@@ -36,6 +38,13 @@ void RotateUp(PLANE_TRAJ_ARR& m_c)
    m_c[2] = Buf;
 }
 
+float GetRoot(float fAsin, float fAtan, int i)
+{
+	return((0 != i) ^ (fabs(M_PI - fAsin - fAtan) > fabs(fAsin - fAtan))) ?
+		fAsin - fAtan : (float)M_PI - fAsin - fAtan;
+}
+
+} // namespace
 
 void CPlaneTrajMath::Direct(int nFlags)
 {
@@ -390,12 +399,6 @@ BOOL CPlaneTrajMath::CalcRgtPhi(int nFlags)
 	}
 	Inverse(nFlags);
 	return bResult;
-}
-
-float GetRoot(float fAsin, float fAtan, int i)
-{
-	return((0 != i) ^ (fabs(M_PI - fAsin - fAtan) > fabs(fAsin - fAtan)))? 
-		fAsin - fAtan : (float)M_PI - fAsin - fAtan;
 }
 
 // Main Equations :

@@ -32,30 +32,7 @@ void EditLock(CWnd* pEdit, BOOL flLock)
 	GetClassName(pEdit->m_hWnd, WindowClass.GetBufferSetLength(CLASS_SIZE), CLASS_SIZE);
 	WindowClass.ReleaseBuffer();
 
-	//BOOL Result = FALSE;
-	//if (WindowClass == CLASS_FPDATETIME)
-	//{
-	//	DeclareEditAsFPDateTime(Edt);
-	//	LockControl(pFPEdit, flLock, coloration);
-	//}
-	//else 
-	//	if (WindowClass == CLASS_FPDOUBLESINGLE)
-	//{
-	//	DeclareEditAsFPDoubleSingle(Edt);
-	//	LockControl(pFPEdit, flLock, coloration);
-	//}
-	//else if (WindowClass == CLASS_FPLONGINTEGER)
-	//{
-	//	DeclareEditAsFPLongInteger(Edt);
-	//	LockControl(pFPEdit, flLock, coloration);
-	//}
-	//else if (WindowClass == CLASS_FPTEXT)
-	//{
-	//	DeclareEditAsFPText(Edt);
-	//	LockControl(pFPEdit, flLock, coloration);
-	//}
-	//else 
-        if (WindowClass == "Edit")
+    if (WindowClass == "Edit")
 	{
 		static_cast<CEdit*>(pEdit)->SetReadOnly(flLock);
 	}
@@ -87,7 +64,6 @@ void ShowControl(CWnd* pWnd, BOOL Show)
 
 const auto Deg2Rad = (float)(M_PI / 180.0);
 const auto Rad2Deg = (float)(180.0 / M_PI);
-
 
 
 // CAboutDlg dialog used for App About
@@ -254,9 +230,7 @@ BOOL CCalcDlg::OnInitDialog()
 
     m_pView->SubclassDlgItem(IDC_TRAJECTORY_VIEW, this);
 
-	m_ToolBar.CreateEx(this);/*, TBSTYLE_FLAT, WS_CHILD |
-		WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS |
-		CBRS_FLYBY | CBRS_SIZE_DYNAMIC);*/
+	m_ToolBar.CreateEx(this);
 	m_ToolBar.LoadToolBar(IDR_2D_DESIGN);
 	RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
 
@@ -343,30 +317,9 @@ void CCalcDlg::OnOK()
 }
 
 
-#define MaxLen  100000.f
-#define MaxRate 100.f
+const auto MaxLen = 100000.f;
+const auto MaxRate = 100.f;
 
-
-/*
-void CCalcDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CBaseTrajDesDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CCalcDlg)
-	DDX_Control(pDX, IDC_Sensitivity, m_Sensitivity);
-	//}}AFX_DATA_MAP
-	DDX_FPValue_(pDX, IDC_TVD, m_fTVD, UV_4_TRAJ_LENGTH, IDC_TVDUnits);
-	DDX_FPValue_(pDX, IDC_Disp, m_fDisp, UV_4_TRAJ_LENGTH, IDC_DispUnits);
-
-	DDX_Text_Ex(pDX, IDC_EDIT2, m_fL1, F_L1, UV_4_TRAJ_LENGTH, IDC_EDIT2Units);
-	DDX_Text_Ex(pDX, IDC_EDIT1, m_fPhi1, F_PHI1, UV_4_TRAJ_ANGLE, AngleUnitStaticId(IDC_EDIT1Units));
-	DDX_Text_Ex(pDX, IDC_EDIT3, m_fBR1, F_R1, UV_4_TRAJ_BUILDRATE, IDC_EDIT3Units);
-	DDX_Text_Ex(pDX, IDC_EDIT5, m_fL2, F_L2, UV_4_TRAJ_LENGTH, IDC_EDIT5Units);
-	DDX_Text_Ex(pDX, IDC_EDIT4, m_fPhi2, F_PHI2, UV_4_TRAJ_ANGLE, AngleUnitStaticId(IDC_EDIT4Units));
-	DDX_Text_Ex(pDX, IDC_EDIT6, m_fBR2, F_R2, UV_4_TRAJ_BUILDRATE, IDC_EDIT6Units);
-	DDX_Text_Ex(pDX, IDC_EDIT8, m_fL3, F_L3, UV_4_TRAJ_LENGTH, IDC_EDIT8Units);
-	DDX_Text_Ex(pDX, IDC_EDIT7, m_fPhi3, F_PHI3, UV_4_TRAJ_ANGLE, AngleUnitStaticId(IDC_EDIT7Units));
-}
-*/
 
 int NBits(int nBits)
 {
@@ -801,7 +754,6 @@ void CCalcDlg::OnButton8()
 void CCalcDlg::OnCancel()
 {
     __super::OnCancel();
-	//Return(FALSE);
 }
 
 BOOL CCalcDlg::IsWorkingMode() { return 2 == NBits(m_nMode); }
@@ -841,21 +793,9 @@ void CCalcDlg::SetValidTrajectory(BOOL bValid)
 	GetDlgItem(IDC_ADD_TO_CLIPBOOK)->EnableWindow(bValid);
 	m_bValidTrajectory = bValid;
 	UpdateData(FALSE);
-	m_pView->InvalidateRect(NULL);//&UpdateRect);
+	m_pView->InvalidateRect(NULL);
 }
 
-//void CCalcDlg::Restore(int nIndex)
-//{
-//	if (nIndex < 0 || nIndex >= m_arrClipbook.GetSize())
-//		return;
-//	if (Load(m_arrClipbook[nIndex].m_arr))
-//	{
-//		m_fTVD = m_arrClipbook[nIndex].m_fTVD;
-//		m_fDisp = m_arrClipbook[nIndex].m_fDisp;
-//		memcpy(m_c, m_arrClipbook[nIndex].m_arr, sizeof(PLANE_TRAJ_ARR));
-//		SetValidTrajectory(TRUE);
-//	}
-//}
 
 void CCalcDlg::SetTrajectoryType(int nTrajectoryType)
 {
@@ -1039,13 +979,6 @@ void CCalcDlg::OnUpdateExtendedSTraj(CCmdUI* pCmdUI)
 {
 	pCmdUI->SetRadio(tkExtendedSTrajectory == GetTrajectoryType());
 }
-
-/*
-CTrajView* CCalcDlg::GetTrajView()
-{
-	return STATIC_DOWNCAST(CTrajView, GetParentFrame()->GetActiveView());
-}
-*/
 
 
 void CCalcDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)

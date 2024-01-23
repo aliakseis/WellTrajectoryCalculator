@@ -4,10 +4,6 @@
 #include "pch.h"
 #include "resource.h"
 #include "Trajview.h"
-//#include "TrajDesignContext.h"
-//#include "TrajUtil.h"
-
-//#include "UnitsVar.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -28,40 +24,6 @@ float GetStep(float fRange)
 
 }
 
-
-//extern AFX_EXTENSION_MODULE*  GetTrajUtilDLL();
-
-/*
-BOOL DllExport TrajViewIsActive(CFrameWnd* pFrame)
-{
-	ASSERT_VALID(pFrame);
-	CBaseView* pView = (CBaseView*)pFrame->GetActiveView();
-	return pView && pView->IsKindOf(RUNTIME_CLASS(CTrajView));
-}
-
-BOOL DllExport ReturnFrom2DDesign(CFrameWnd* pFrame)
-{
-	ASSERT_VALID(pFrame);
-	CBaseView* pView = (CBaseView*)pFrame->GetActiveView();
-	if(pView && pView->IsKindOf(RUNTIME_CLASS(CTrajView)))
-	{
-		((CTrajView*)pView)->m_CalcDlg.OnCancel();
-		return TRUE;
-	}
-	return FALSE;
-}
-
-int DllExport GetTrajViewIDR()
-{
-	return IDR_2D_DESIGN;
-}
-
-HMODULE DllExport GetTrajUtilHResource()
-{
-	return GetTrajUtilDLL()->hResource;
-}
-*/
-
 /////////////////////////////////////////////////////////////////////////////
 // CTrajView
 
@@ -72,59 +34,6 @@ CTrajView::~CTrajView()
 {
 }
 
-/*
-void CTrajView::OnInitialUpdate()
-{
-	CBaseView::OnInitialUpdate();
-// Now get data from 3D view
-	m_CalcDlg.m_fPhi1		= GetContext()->m_fStartAngle;
-//	m_CalcDlg.m_fPhi3		= GetContext()->m_fEndAngle;
-	m_CalcDlg.SetHitAngle(GetContext()->m_fEndAngle);
-	m_CalcDlg.m_fTVD		= GetContext()->m_fTVD;
-	m_CalcDlg.m_fDisp		= GetContext()->m_fDisp;
-   m_CalcDlg.m_bFixAngle= GetContext()->m_bFixAngle;
-//	m_CalcDlg.m_nTrajectoryType = GetContext()->Get3DTrajectoryType();
-
-   HINSTANCE hInstOld = AfxGetResourceHandle(); // to load resources from this DLL
-   AfxSetResourceHandle(GetTrajUtilDLL()->hModule);
-
-	m_CalcDlg.Create(GetParentFrame());//this);
-	m_CalcDlg.SetTrajectoryType(GetContext()->Get3DTrajectoryType());
-
-   AfxSetResourceHandle(hInstOld); // restore the old resource chain
-
-	m_CalcDlg.ShowWindow(SW_SHOW);
-
-   CRect Rect1,Rect2;
-   GetWindowRect(&Rect1);
-   m_CalcDlg.GetWindowRect(&Rect2);
-
-   Rect1.bottom = Rect1.top + max(Rect1.Height(), Rect2.Height());
-   GetParentFrame()->SetWindowPos(NULL, 0, 0,
-   							 Rect1.Width() + GetSystemMetrics(SM_CXFRAME), 
-   							 Rect1.Height()+ GetSystemMetrics(SM_CYFRAME)
-   								 				+ GetSystemMetrics(SM_CYCAPTION) + 1,
-   					SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE );
-
-   m_CalcDlg.SetWindowPos(NULL, 0, 0, Rect2.Width(), Rect1.Height(),
-   					SWP_NOZORDER | SWP_NOACTIVATE );
-
-	ScreenToClient(&Rect1);
-	Rect1.left += Rect2.Width();
-//	m_CalcDlg.UpdateRect = Rect1;
-	SetWindowPos(NULL, Rect1.left, Rect1.top, Rect1.Width(), Rect1.Height(),
-   					SWP_NOZORDER | SWP_NOACTIVATE );
-}
-*/
-
-//#ifdef _DEBUG
-
-//CDestrajDoc* CTrajView::GetDocument() // non-debug version is inline
-//{
-//	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CDestrajDoc)));
-//	return (CDestrajDoc*)m_pDocument;
-//}
-//#endif //_DEBUG
 
 BEGIN_MESSAGE_MAP(CTrajView, CWnd)
 	//{{AFX_MSG_MAP(CTrajView)
@@ -160,9 +69,6 @@ BOOL IsMarkerHere(CPoint Marker, CPoint Mouse)
 /////////////////////////////////////////////////////////////////////////////
 // CTrajView drawing
 
-//inline float fmin(float a, float b) {return(a < b)? a : b; }
-
-//inline float fmax(float a, float b) {return(a > b)? a : b; }
 
 inline float fsqr(float x) {return x * x; }
 
@@ -282,16 +188,13 @@ void CTrajView::OnPaint()
 {
 	if (!m_CalcDlg.m_bValidTrajectory)
 	{
-        //__super::OnPaint();
         ValidateRect(NULL);
 		return;
 	}
-	CRect rect;
-//	m_CalcDlg.GetWindowRect(rect);
-//	int nDlgWidth = rect.Width();
 
 	CPaintDC dc(this); // device context for painting
 
+	CRect rect;
 	GetClientRect(&rect);
 
     dc.IntersectClipRect(rect);
@@ -587,7 +490,6 @@ void CTrajView::OnLButtonDown(UINT nFlags, CPoint point)
 						break;
 		}
 	}
-//	CBaseView::OnLButtonDown(nFlags, point);
 }
 
 void CTrajView::OnMouseMove(UINT nFlags, CPoint point)
@@ -737,7 +639,6 @@ void CTrajView::OnLButtonUp(UINT nFlags, CPoint point)
 		DestroyCursor(SetCursor(AfxGetApp()->LoadCursor((LPCTSTR)IDC_NOACTION)));
 		InvalidateRect(NULL);//&m_CalcDlg.UpdateRect);
 	}
-	//CBaseView::OnLButtonUp(nFlags, point);
 }
 
 int CTrajView::GetSegNumber() 
@@ -765,7 +666,7 @@ int CTrajView::GetMarkerNumber()
 LRESULT CTrajView::OnNcHitTest(CPoint point)
 {
 	// https://groups.google.com/g/microsoft.public.vc.mfc/c/fHJiQmwZpfk
-	return HTCLIENT;// CWnd::OnNcHitTest(point);
+	return HTCLIENT;
 }
 
 

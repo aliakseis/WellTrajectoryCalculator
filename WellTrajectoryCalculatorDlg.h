@@ -36,10 +36,7 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 
-	// Construction
 public:
-//	CCalcDlg(CWnd* pParent = NULL);	// standard constructor
-//	BOOL Create(CWnd* pParent = NULL);
 	virtual void OnOK();
 	virtual void OnCancel();
 	bool TryToApply();
@@ -54,15 +51,10 @@ public:
 	float	m_fL3;
 
 
-	// Dialog Data
-		//{{AFX_DATA(CCalcDlg)
-	//enum { IDD = IDD_2DDIALOG };
 	CSliderCtrl	m_Sensitivity;
 	float	m_fTVD;
 	float	m_fDisp;
-	//}}AFX_DATA
 	PLANE_TRAJ_ARR m_c;
-	//	CRect UpdateRect;
 	BOOL m_bValidTrajectory = FALSE;
 	BOOL m_bIsotropic = FALSE;
 	BOOL m_bFixAngle = FALSE;
@@ -72,17 +64,9 @@ public:
 	int  GetEditFlags();
 	void Store(PLANE_TRAJ_ARR& c);
 	BOOL Load(const PLANE_TRAJ_ARR& c);
-	//void Restore(int nIndex);
 	void SetTrajectoryType(int nTrajectoryType);
 	int GetTrajectoryType() { return m_nTrajectoryType; }
 	void SetHitAngle(float fHitAngle) { m_fHitAngle = fHitAngle; }
-
-	// Overrides
-		// ClassWizard generated virtual function overrides
-		//{{AFX_VIRTUAL(CCalcDlg)
-//protected:
-//	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
 
 // Implementation
 protected:
@@ -90,12 +74,9 @@ protected:
 	void SetMode(int nFlag, BOOL bEnable);
 	BOOL MakeChoice(int nFlag, float* fVal, float fBound, int nCount, BOOL bExcludeZero);
 	void SetReadOnly(int nID, BOOL bReadOnly);
-	//void Return(BOOL bSave);
 	void DDX_Text_Ex(CDataExchange* pDX, int nIDC, float& value, int nFlag);
-	//	EUCVariables eUnitType, int nUnitIDC);
 	void SetValidTrajectory(BOOL bValid);
 	void EnableButton(int nButtonID, int nSpinID, BOOL bEnable, BOOL bVisible);
-	//CTrajView* GetTrajView();
 
 	// Generated message map functions
 	//{{AFX_MSG(CCalcDlg)
@@ -133,7 +114,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 	bool TrySpinValue() { return TryToApply(); }
-	//virtual DWORD GetWindowID() { return WPID_DTCalculate; }
 	BOOL PreTranslateMessage(MSG* pMsg) override;
 
 

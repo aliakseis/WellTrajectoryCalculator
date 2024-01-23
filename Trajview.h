@@ -43,10 +43,8 @@ public:
 
 // Implementation
 protected:
-	//virtual void OnInitialUpdate();
 	void DrawAxes(CDC* pDC);
-	//virtual	void OnDraw(CDC* pDC);		// overridden to draw this view
-	int GetSegNumber();// { return GetContext()->Get3DTrajectoryType() + 2; }
+	int GetSegNumber();
 	int GetMarkerNumber();
 
 	// Generated message map functions
