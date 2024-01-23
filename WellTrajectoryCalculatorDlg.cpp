@@ -214,6 +214,7 @@ BEGIN_MESSAGE_MAP(CCalcDlg, CDialogEx)
 	ON_UPDATE_COMMAND_UI(IDM_EXT_J_TRAJ, OnUpdateExtendedJTraj)
 	ON_UPDATE_COMMAND_UI(IDM_S_TRAJ, OnUpdateSTraj)
 	ON_UPDATE_COMMAND_UI(IDM_EXT_S_TRAJ, OnUpdateExtendedSTraj)
+	ON_WM_VSCROLL()
 END_MESSAGE_MAP()
 
 
@@ -925,83 +926,58 @@ void CCalcDlg::SetTrajectoryType(int nTrajectoryType)
 	EnableButtons(NBits(m_nMode) == 2);
 }
 
-/**
-void CCalcDlg::OnAddToClipbook()
-{
-	HINSTANCE hInstOld = AfxGetResourceHandle(); // to load resources from this DLL
-	AfxSetResourceHandle(GetTrajUtilDLL()->hModule);
-
-	ASSERT(m_bValidTrajectory);
-	CDlgNewClipbookRec dlg;
-	int nResult = dlg.DoModal();
-	AfxSetResourceHandle(hInstOld); // restore the old resource chain
-	if (IDOK != nResult)
-		return;
-
-	int nIndex = m_arrClipbook.GetSize();
-	m_arrClipbook.SetSize(nIndex + 1);
-	Store(m_arrClipbook[nIndex].m_arr);
-	m_arrClipbook[nIndex].m_fTVD = m_fTVD;
-	m_arrClipbook[nIndex].m_fDisp = m_fDisp;
-	m_arrClipbook[nIndex].m_strName = dlg.m_strName;
-	GetDlgItem(IDC_CLIPBOOK)->EnableWindow(TRUE);
-}
-*/
-
-/*
-void CCalcDlg::OnVScroll(UINT nSBCode, UINT nPos, CWnd* pScrollBar)
-{
-//	CBaseTrajDesDialog::OnVScroll(nSBCode, nPos, pScrollBar);
-	static bool bRecurs = false;
-	if(bRecurs || !pScrollBar || nSBCode != SB_THUMBPOSITION)
-		return;
-	bRecurs = true;
-	ASSERT_VALID(pScrollBar);
-	float* pVal;
-	switch(pScrollBar->GetDlgCtrlID())
-	{
-		case IDC_SPIN1: pVal = &m_fPhi1; break;
-		case IDC_SPIN2: pVal = &m_fL1;	break;
-		case IDC_SPIN3: pVal = &m_fBR1;	break;
-		case IDC_SPIN4: pVal = &m_fPhi2; break;
-		case IDC_SPIN5: pVal = &m_fL2;	break;
-		case IDC_SPIN6: pVal = &m_fBR2;	break;
-		case IDC_SPIN7: pVal = &m_fPhi3; break;
-		case IDC_SPIN8: pVal = &m_fL3;	break;
-		default: ASSERT(0); bRecurs = false; return;
-	}
-	((CSpinButtonCtrl*)pScrollBar)->SetPos(0);
-	float fSaveVal = *pVal;
-	*pVal += (signed)nPos;
-	if(!TryToApply())
-		*pVal = fSaveVal;
-	bRecurs = false;
-}
-
 static TCHAR szSpinClassName[] = _T("msctls_updown32");
 #define SpinClassNameSize (sizeof(szSpinClassName) + sizeof(TCHAR))
 
 BOOL CCalcDlg::PreTranslateMessage(MSG* pMsg)
 {
-	if(WM_KEYDOWN == pMsg->message && (VK_UP == pMsg->wParam || VK_DOWN == pMsg->wParam))
+	if (WM_KEYDOWN == pMsg->message && (VK_UP == pMsg->wParam || VK_DOWN == pMsg->wParam))
 	{
 		HWND hWndNext = ::GetWindow(pMsg->hwnd, GW_HWNDNEXT);
-		if(IsWindow(hWndNext))
+		if (IsWindow(hWndNext))
 		{
 			CString strClassName;
 			GetClassName(hWndNext,
 				strClassName.GetBuffer(SpinClassNameSize), SpinClassNameSize);
-			if(strClassName == szSpinClassName)
+			if (strClassName == szSpinClassName)
 			{
-				OnVScroll(SB_THUMBPOSITION, (VK_UP == pMsg->wParam)? 1 : -1,
-									CWnd::FromHandle(hWndNext));
+				OnVScroll(SB_THUMBPOSITION, (VK_UP == pMsg->wParam) ? 1 : -1,
+					static_cast<CScrollBar*>(CWnd::FromHandle(hWndNext)));
 				return TRUE;
 			}
 		}
 	}
-	return CBaseTrajDesDialog::PreTranslateMessage(pMsg);
+	return __super::PreTranslateMessage(pMsg);
 }
-*/
+
+void CCalcDlg::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	static bool bRecurs = false;
+	if (bRecurs || !pScrollBar || nSBCode != SB_THUMBPOSITION)
+		return;
+	bRecurs = true;
+	ASSERT_VALID(pScrollBar);
+	float* pVal;
+	switch (pScrollBar->GetDlgCtrlID())
+	{
+	case IDC_SPIN1: pVal = &m_fPhi1; break;
+	case IDC_SPIN2: pVal = &m_fL1;	break;
+	case IDC_SPIN3: pVal = &m_fBR1;	break;
+	case IDC_SPIN4: pVal = &m_fPhi2; break;
+	case IDC_SPIN5: pVal = &m_fL2;	break;
+	case IDC_SPIN6: pVal = &m_fBR2;	break;
+	case IDC_SPIN7: pVal = &m_fPhi3; break;
+	case IDC_SPIN8: pVal = &m_fL3;	break;
+	default: ASSERT(0); bRecurs = false; return;
+	}
+	((CSpinButtonCtrl*)pScrollBar)->SetPos(0);
+	float fSaveVal = *pVal;
+	*pVal += (signed)nPos;
+	if (!TrySpinValue())
+		*pVal = fSaveVal;
+	bRecurs = false;
+}
+
 
 void CCalcDlg::OnJTraj()
 {
