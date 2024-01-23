@@ -62,8 +62,8 @@ void ShowControl(CWnd* pWnd, BOOL Show)
 
 }
 
-const auto Deg2Rad = (float)(M_PI / 180.0);
-const auto Rad2Deg = (float)(180.0 / M_PI);
+const auto Deg2Rad = (double)(M_PI / 180.0);
+const auto Rad2Deg = (double)(180.0 / M_PI);
 
 
 // CAboutDlg dialog used for App About
@@ -108,19 +108,19 @@ CCalcDlg::CCalcDlg(CWnd* pParent /*=nullptr*/)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
-	m_fL1 = (float)100.0;
-	m_fPhi1 = (float)10.0;
-	m_fBR1 = (float)40.0;
+	m_fL1 = (double)100.0;
+	m_fPhi1 = (double)10.0;
+	m_fBR1 = (double)40.0;
 
-	m_fL2 = (float)100.0;
-	m_fPhi2 = (float)50.0;
-	m_fBR2 = (float)-50.0;
+	m_fL2 = (double)100.0;
+	m_fPhi2 = (double)50.0;
+	m_fBR2 = (double)-50.0;
 
-	m_fL3 = (float)100.0;
-	m_fPhi3 = (float)0.0;
+	m_fL3 = (double)100.0;
+	m_fPhi3 = (double)0.0;
 
-	m_fTVD = (float)435.4;
-	m_fDisp = (float)183.89;
+	m_fTVD = (double)435.4;
+	m_fDisp = (double)183.89;
 
 	m_nMode = 0;
 	m_bValidTrajectory = FALSE;
@@ -132,7 +132,7 @@ CCalcDlg::CCalcDlg(CWnd* pParent /*=nullptr*/)
 
 CCalcDlg::~CCalcDlg() = default;
 
-void CCalcDlg::DDX_Text_Ex(CDataExchange* pDX, int nIDC, float& value, int nFlag)
+void CCalcDlg::DDX_Text_Ex(CDataExchange* pDX, int nIDC, double& value, int nFlag)
 {
 	if (!(m_nMode & nFlag) || m_bValidTrajectory)
 		DDX_Text(pDX, nIDC, value);
@@ -477,9 +477,9 @@ BOOL CheckData(const PLANE_TRAJ_ARR& c)
 	if (c[0].L < 0 || c[1].L < 0 || c[2].L < 0 ||
 		c[0].L > MaxLen || c[1].L > MaxLen || c[2].L > MaxLen) return FALSE;
 	for (int i = 0; i < 2; i++) {
-		float fAngle = c[i + 1].Phi - c[i].Phi;
-		while (fAngle > M_PI) fAngle -= float(M_PI * 2);
-		while (fAngle < -M_PI) fAngle += float(M_PI * 2);
+		double fAngle = c[i + 1].Phi - c[i].Phi;
+		while (fAngle > M_PI) fAngle -= double(M_PI * 2);
+		while (fAngle < -M_PI) fAngle += double(M_PI * 2);
 		if (fAngle * c[i].R < 0) return FALSE;
 	}
 	return TRUE;
@@ -508,7 +508,7 @@ void CCalcDlg::Store(PLANE_TRAJ_ARR& c)
 
 BOOL CCalcDlg::Load(const PLANE_TRAJ_ARR& c)
 {
-	float fBR1, fBR2;
+	double fBR1, fBR2;
 	if (c[0].R != 0.) fBR1 = Rad2Deg * 100 / c[0].R;
 	else fBR1 = 0.f;
 	if (c[1].R != 0.) fBR2 = Rad2Deg * 100 / c[1].R;
@@ -624,7 +624,7 @@ bool CCalcDlg::TryToApply()
 	if (!bCorrect || !CheckData(c) || !Load(c))
 		return FALSE;
 	/*
-		float fBR1,fBR2;
+		double fBR1,fBR2;
 		if(c[0].R != 0.) fBR1 = Rad2Deg * 100 / c[0].R;
 		else fBR1 = 0.f;
 		if(c[1].R != 0.) fBR2 = Rad2Deg * 100 / c[1].R;
@@ -676,11 +676,11 @@ void CCalcDlg::OnIsotropic()
 	m_pView->InvalidateRect(NULL);
 }
 
-BOOL CCalcDlg::MakeChoice(int nFlag, float* fVal, float fBound, int nCount, BOOL bExcludeZero)
+BOOL CCalcDlg::MakeChoice(int nFlag, double* fVal, double fBound, int nCount, BOOL bExcludeZero)
 {
 	if (2 != NBits(m_nMode) || m_nMode & nFlag || !UpdateData(TRUE)) return FALSE;
 	if (TryToApply()) return TRUE;
-	float fStartVal = *fVal;
+	double fStartVal = *fVal;
 	fBound /= nCount;
 	BOOL bFind = FALSE;
 
@@ -705,7 +705,7 @@ BOOL CCalcDlg::MakeChoice(int nFlag, float* fVal, float fBound, int nCount, BOOL
 
 void CCalcDlg::OnButton1()
 {
-	if (!MakeChoice(F_PHI1, &m_fPhi1, (float)360., 2000, FALSE))
+	if (!MakeChoice(F_PHI1, &m_fPhi1, (double)360., 2000, FALSE))
 		GetDlgItem(IDC_BUTTON1)->EnableWindow(FALSE);
 }
 
@@ -717,13 +717,13 @@ void CCalcDlg::OnButton2()
 
 void CCalcDlg::OnButton3()
 {
-	if (!MakeChoice(F_R1, &m_fBR1, (float)MaxRate * 2, 2000, TRUE))
+	if (!MakeChoice(F_R1, &m_fBR1, (double)MaxRate * 2, 2000, TRUE))
 		GetDlgItem(IDC_BUTTON3)->EnableWindow(FALSE);
 }
 
 void CCalcDlg::OnButton4()
 {
-	if (!MakeChoice(F_PHI2, &m_fPhi2, (float)360., 2000, FALSE))
+	if (!MakeChoice(F_PHI2, &m_fPhi2, (double)360., 2000, FALSE))
 		GetDlgItem(IDC_BUTTON4)->EnableWindow(FALSE);
 }
 
@@ -741,7 +741,7 @@ void CCalcDlg::OnButton6()
 
 void CCalcDlg::OnButton7()
 {
-	if (!MakeChoice(F_PHI3, &m_fPhi3, (float)360., 2000, FALSE))
+	if (!MakeChoice(F_PHI3, &m_fPhi3, (double)360., 2000, FALSE))
 		GetDlgItem(IDC_BUTTON7)->EnableWindow(FALSE);
 }
 
@@ -914,7 +914,7 @@ void CCalcDlg::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		return;
 	bRecurs = true;
 	ASSERT_VALID(pScrollBar);
-	float* pVal;
+	double* pVal;
 	switch (pScrollBar->GetDlgCtrlID())
 	{
 	case IDC_SPIN1: pVal = &m_fPhi1; break;
@@ -928,7 +928,7 @@ void CCalcDlg::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	default: ASSERT(0); bRecurs = false; return;
 	}
 	((CSpinButtonCtrl*)pScrollBar)->SetPos(0);
-	float fSaveVal = *pVal;
+	double fSaveVal = *pVal;
 	*pVal += (signed)nPos;
 	if (!TrySpinValue())
 		*pVal = fSaveVal;

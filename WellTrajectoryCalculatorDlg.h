@@ -41,24 +41,24 @@ public:
 	virtual void OnCancel();
 	bool TryToApply();
 
-	float	m_fPhi1;
-	float	m_fL1;
-	float	m_fBR1;
-	float	m_fPhi2;
-	float	m_fL2;
-	float	m_fBR2;
-	float	m_fPhi3;
-	float	m_fL3;
+	double	m_fPhi1;
+	double	m_fL1;
+	double	m_fBR1;
+	double	m_fPhi2;
+	double	m_fL2;
+	double	m_fBR2;
+	double	m_fPhi3;
+	double	m_fL3;
 
 
 	CSliderCtrl	m_Sensitivity;
 
-	float	m_fTVD;
-	float	m_fDisp;
+	double	m_fTVD;
+	double	m_fDisp;
 	PLANE_TRAJ_ARR m_c;
 
-	float	m_fClipTVD;
-	float	m_fClipDisp;
+	double	m_fClipTVD;
+	double	m_fClipDisp;
 	PLANE_TRAJ_ARR m_clip;
 
 	BOOL m_bValidTrajectory = FALSE;
@@ -72,15 +72,15 @@ public:
 	BOOL Load(const PLANE_TRAJ_ARR& c);
 	void SetTrajectoryType(int nTrajectoryType);
 	int GetTrajectoryType() { return m_nTrajectoryType; }
-	void SetHitAngle(float fHitAngle) { m_fHitAngle = fHitAngle; }
+	void SetHitAngle(double fHitAngle) { m_fHitAngle = fHitAngle; }
 
 // Implementation
 protected:
 	void EnableButtons(BOOL bEnable);
 	void SetMode(int nFlag, BOOL bEnable);
-	BOOL MakeChoice(int nFlag, float* fVal, float fBound, int nCount, BOOL bExcludeZero);
+	BOOL MakeChoice(int nFlag, double* fVal, double fBound, int nCount, BOOL bExcludeZero);
 	void SetReadOnly(int nID, BOOL bReadOnly);
-	void DDX_Text_Ex(CDataExchange* pDX, int nIDC, float& value, int nFlag);
+	void DDX_Text_Ex(CDataExchange* pDX, int nIDC, double& value, int nFlag);
 	void SetValidTrajectory(BOOL bValid);
 	void EnableButton(int nButtonID, int nSpinID, BOOL bEnable, BOOL bVisible);
 
@@ -126,7 +126,7 @@ protected:
 private:
 	int   m_nMode;
 	int   m_nTrajectoryType;
-	float m_fHitAngle;
+	double m_fHitAngle;
 
     std::unique_ptr<CTrajView> m_pView;
 	CToolBar m_ToolBar;

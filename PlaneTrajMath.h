@@ -22,7 +22,7 @@ enum {
 
 struct PLANE_TRAJ_CELL
 {
-	float L, Phi, R;
+	double L, Phi, R;
 };
 
 typedef std::array<PLANE_TRAJ_CELL, 3> PLANE_TRAJ_ARR;
@@ -30,14 +30,14 @@ typedef std::array<PLANE_TRAJ_CELL, 3> PLANE_TRAJ_ARR;
 class CPlaneTrajMath
 {
 public:
-	CPlaneTrajMath(PLANE_TRAJ_ARR& c, float fTVD, float fDisp)
+	CPlaneTrajMath(PLANE_TRAJ_ARR& c, double fTVD, double fDisp)
         : m_c(c), m_fTVD(fTVD), m_fDisp(fDisp)
 	{
 	}
 	void Direct(int nFlags);
 	void Inverse(int nFlags);
-	float GetTVDError();
-	float GetDispError();
+	double GetTVDError();
+	double GetDispError();
 
 	BOOL FindSolution2x2();
 	void FindAngle();
@@ -56,7 +56,7 @@ public:
 
 private:
 	PLANE_TRAJ_ARR& m_c;
-   float sin0, sin1, sin2,
+   double sin0, sin1, sin2,
    		cos0, cos1, cos2,
    		fA, fB, fC, fD, fE, fF, fG, fH,
    		m_fTVD, m_fDisp;

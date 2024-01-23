@@ -12,9 +12,9 @@ static char BASED_CODE THIS_FILE[] = __FILE__;
 
 namespace {
 
-float GetStep(float fRange)
+double GetStep(double fRange)
 {
-   float fStep=(fRange>0)? 1e10f : -1e10f;
+   double fStep=(fRange>0)? 1e10f : -1e10f;
    while(fabs(fStep) > fabs(fRange)) fStep /= 10;
    if(fabs(fStep) * 5 <= fabs(fRange)) fStep *= 5;
    else if(fabs(fStep) * 2 <= fabs(fRange)) fStep *= 2;
@@ -70,7 +70,7 @@ BOOL IsMarkerHere(CPoint Marker, CPoint Mouse)
 // CTrajView drawing
 
 
-inline float fsqr(float x) {return x * x; }
+inline double fsqr(double x) {return x * x; }
 
 void CTrajView::DrawAxes(CDC* pDC)
 {
@@ -78,7 +78,7 @@ void CTrajView::DrawAxes(CDC* pDC)
 	int nFlag;
    if(m_State != TVS_DRAGGING)
 	   return;
-	float fNorm = 160.f / (float)sqrt(fsqr(m_fCoeffY * m_fCos) + fsqr(m_fCoeffX * m_fSin));
+	double fNorm = 160.f / (double)sqrt(fsqr(m_fCoeffY * m_fCos) + fsqr(m_fCoeffX * m_fSin));
 
 	switch(m_nMarker) {
 		case 0: nFlag = F_PHI1; break;
@@ -204,7 +204,7 @@ void CTrajView::OnPaint()
 	rect.right -= 12;
 	rect.bottom -= 12;
 
-	float fXmin,fXmax,fYmin,fYmax;
+	double fXmin,fXmax,fYmin,fYmax;
    if(m_CalcDlg.m_fTVD > 0) 
 	{ 
 		fYmin = 0.f; 
@@ -228,11 +228,11 @@ void CTrajView::OnPaint()
 	}
 
 
-   float fX = 0.f;
-   float fY = 0.f;
+   double fX = 0.f;
+   double fY = 0.f;
 
-   float fCoeffX = 0.f;
-   float fCoeffY = 0.f;
+   double fCoeffX = 0.f;
+   double fCoeffY = 0.f;
 	
    CDC* pDC = &dc;
 
@@ -246,23 +246,23 @@ void CTrajView::OnPaint()
 		if(bDraw)
 		{
 		//	Grid drawing
-			//float fEvenStepX = GetStep(ToUnits_(fXmax - fXmin, UV_4_TRAJ_LENGTH) / 4);
-			//float fEvenStepY = GetStep(ToUnits_(fYmax - fYmin, UV_4_TRAJ_LENGTH) / 4);
-			//float fStepX = FromUnits_(fEvenStepX, UV_4_TRAJ_LENGTH);
-			//float fStepY = FromUnits_(fEvenStepY, UV_4_TRAJ_LENGTH);
-			float fEvenStepX = GetStep((fXmax - fXmin) / 4);
-			float fEvenStepY = GetStep((fYmax - fYmin) / 4);
-			float fStepX = fEvenStepX;
-			float fStepY = fEvenStepY;
+			//double fEvenStepX = GetStep(ToUnits_(fXmax - fXmin, UV_4_TRAJ_LENGTH) / 4);
+			//double fEvenStepY = GetStep(ToUnits_(fYmax - fYmin, UV_4_TRAJ_LENGTH) / 4);
+			//double fStepX = FromUnits_(fEvenStepX, UV_4_TRAJ_LENGTH);
+			//double fStepY = FromUnits_(fEvenStepY, UV_4_TRAJ_LENGTH);
+			double fEvenStepX = GetStep((fXmax - fXmin) / 4);
+			double fEvenStepY = GetStep((fYmax - fYmin) / 4);
+			double fStepX = fEvenStepX;
+			double fStepY = fEvenStepY;
 			if(m_CalcDlg.m_bIsotropic)
 				fStepX = fStepY = max(fStepX, fStepY);
 
-			float fOffsetX = fX * fCoeffX;
+			double fOffsetX = fX * fCoeffX;
 			while(fOffsetX + Epsilon >= 0)
 				fOffsetX -= fStepX * fCoeffX;
 			fOffsetX += rect.left;
 
-			float fOffsetY = fY * fCoeffY;
+			double fOffsetY = fY * fCoeffY;
 			while(fOffsetY + Epsilon >= 0)
 				fOffsetY -= fStepY * fCoeffY;
 			fOffsetY += rect.top;
@@ -358,8 +358,8 @@ void CTrajView::OnPaint()
 	   Line[0].y = (int)(rect.top + fY * fCoeffY);
 	   for(int i = 0; i < 3; i++) 
 		{
-	   	float sin0 = (float)sin(m_CalcDlg.m_c[i].Phi);
-	   	float cos0 = (float)cos(m_CalcDlg.m_c[i].Phi);
+	   	double sin0 = (double)sin(m_CalcDlg.m_c[i].Phi);
+	   	double cos0 = (double)cos(m_CalcDlg.m_c[i].Phi);
 			fX += m_CalcDlg.m_c[i].L * sin0;
 			fY += m_CalcDlg.m_c[i].L * cos0;
 		   Line[1].x = (int)(rect.left +fX * fCoeffX);
@@ -370,16 +370,16 @@ void CTrajView::OnPaint()
 		   m_Markers[i*2].fCos = cos0;
 	      if(bDraw) pDC->Polyline(Line, 2);
 	      if(i < 2) {                
-	      	float fR = m_CalcDlg.m_c[i].R;
+	      	double fR = m_CalcDlg.m_c[i].R;
 	      	fX += fR * cos0;
 	      	fY -= fR * sin0;
-	      	float sin1 = (float)sin(m_CalcDlg.m_c[i + 1].Phi);
-	      	float cos1 = (float)cos(m_CalcDlg.m_c[i + 1].Phi);
+	      	double sin1 = (double)sin(m_CalcDlg.m_c[i + 1].Phi);
+	      	double cos1 = (double)cos(m_CalcDlg.m_c[i + 1].Phi);
 	      	if(!bDraw) {              
-	      	   float fRabs = (float)fabs(fR);
-	      	   float fAngle = m_CalcDlg.m_c[i + 1].Phi - m_CalcDlg.m_c[i].Phi;
-	      	   while(fAngle > M_PI) fAngle -= (float)(2 * M_PI);
-	      	   while(fAngle < -M_PI) fAngle += (float)(2 * M_PI);
+	      	   double fRabs = (double)fabs(fR);
+	      	   double fAngle = m_CalcDlg.m_c[i + 1].Phi - m_CalcDlg.m_c[i].Phi;
+	      	   while(fAngle > M_PI) fAngle -= (double)(2 * M_PI);
+	      	   while(fAngle < -M_PI) fAngle += (double)(2 * M_PI);
 	      	   BOOL bIsHalfTurn = (fAngle * fR < 0);
                BOOL bExtendX = FALSE;
                BOOL bExtendY = FALSE;
@@ -428,9 +428,9 @@ void CTrajView::OnPaint()
 			   m_Markers[i*2 + 1].Point.x = (Line[0].x + Line[1].x) / 2;
 			   m_Markers[i*2 + 1].Point.y = (Line[0].y + Line[1].y) / 2;
 			   m_Markers[i*2 + 1].fSin = 
-			   	(float)sin((m_CalcDlg.m_c[i].Phi + m_CalcDlg.m_c[i + 1].Phi) / 2);
+			   	(double)sin((m_CalcDlg.m_c[i].Phi + m_CalcDlg.m_c[i + 1].Phi) / 2);
 			   m_Markers[i*2 + 1].fCos =
-			   	(float)cos((m_CalcDlg.m_c[i].Phi + m_CalcDlg.m_c[i + 1].Phi) / 2);
+			   	(double)cos((m_CalcDlg.m_c[i].Phi + m_CalcDlg.m_c[i + 1].Phi) / 2);
 
 			   if(bDraw && m_CalcDlg.m_c[i+1].Phi != m_CalcDlg.m_c[i].Phi &&
 			   	Line[0] != Line[1] && fR != 0) {
@@ -495,7 +495,7 @@ void CTrajView::OnLButtonDown(UINT nFlags, CPoint point)
 void CTrajView::OnMouseMove(UINT nFlags, CPoint point)
 {
 	int nMarker;
-   float fSaveL, fSaveBR, fSavePhi;
+   double fSaveL, fSaveBR, fSavePhi;
    if(m_CalcDlg.IsWorkingMode() && m_CalcDlg.m_bValidTrajectory) {
 		BOOL bOnMarker = FALSE;
 	   for(nMarker = 0; nMarker < GetMarkerNumber(); nMarker++) 
@@ -537,24 +537,24 @@ void CTrajView::OnMouseMove(UINT nFlags, CPoint point)
 						m_State = TVS_NONE;
 					} break;
 			case TVS_DRAGGING:
-               float fSensitivity = (float)exp(0.3 * (float)(m_CalcDlg.m_Sensitivity.GetPos() -10));
-			      float x = fSensitivity * (float)(point.x - m_InitialOffset.x);// * sqrt(m_fCoeffY / m_fCoeffX);// - m_Markers[m_nMarker].Point.x;
-			      float y = fSensitivity * (float)(point.y - m_InitialOffset.y);// * sqrt(m_fCoeffX / m_fCoeffY);// - m_Markers[m_nMarker].Point.y;
-               float fConv = (float)sqrt(m_fCoeffX / m_fCoeffY);
+               double fSensitivity = (double)exp(0.3 * (double)(m_CalcDlg.m_Sensitivity.GetPos() -10));
+			      double x = fSensitivity * (double)(point.x - m_InitialOffset.x);// * sqrt(m_fCoeffY / m_fCoeffX);// - m_Markers[m_nMarker].Point.x;
+			      double y = fSensitivity * (double)(point.y - m_InitialOffset.y);// * sqrt(m_fCoeffX / m_fCoeffY);// - m_Markers[m_nMarker].Point.y;
+               double fConv = (double)sqrt(m_fCoeffX / m_fCoeffY);
 
-			      float fLong = y * m_fCos / fConv + 
+			      double fLong = y * m_fCos / fConv + 
 			                    x * m_fSin * fConv;  
-			      float fTrans =x * m_fCos / fConv - 
+			      double fTrans =x * m_fCos / fConv - 
 			      				  y * m_fSin * fConv;
 			      				  
-//			      float fLong = y * m_fCos / m_fCoeffX + 
+//			      double fLong = y * m_fCos / m_fCoeffX + 
 //			                    x * m_fSin / m_fCoeffY;  
-//			      float fTrans =x * m_fCos / m_fCoeffX - 
+//			      double fTrans =x * m_fCos / m_fCoeffX - 
 //			      				  y * m_fSin / m_fCoeffY;
 
-				  const auto fCoeffPhi = (float)0.5;
-				  const auto fCoeffL = (float)1.;
-				  const auto fCoeffBR = (float)1.;
+				  const auto fCoeffPhi = (double)0.5;
+				  const auto fCoeffL = (double)1.;
+				  const auto fCoeffBR = (double)1.;
 
 					BOOL bAllowed = TRUE;
 		         switch(m_nMarker) 

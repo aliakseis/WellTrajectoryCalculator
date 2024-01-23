@@ -6,7 +6,7 @@
 
  struct MARKER {
 	CPoint Point;
-	float fSin, fCos;
+	double fSin, fCos;
 };
 
 enum TrajViewState {TVS_NONE, TVS_ONMARKER, TVS_DRAGGING } ;
@@ -34,7 +34,7 @@ public:
 	MARKER m_Markers[5];
 	int m_nMarker;
 	CPoint m_InitialOffset;
-	float m_fSin, m_fCos,
+	double m_fSin, m_fCos,
 			m_fSavePhi, m_fSaveL, m_fSaveBR,
 			m_fCoeffX, m_fCoeffY;
 	CTrajDesignContext* m_pContext;
