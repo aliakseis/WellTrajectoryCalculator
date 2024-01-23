@@ -290,7 +290,12 @@ void CTrajView::OnPaint()
 //	m_CalcDlg.GetWindowRect(rect);
 //	int nDlgWidth = rect.Width();
 
+	CPaintDC dc(this); // device context for painting
+
 	GetClientRect(&rect);
+
+    dc.IntersectClipRect(rect);
+
 	rect.left += /*nDlgWidth +*/ 20;
 	rect.top += 20;
 	rect.right -= 12;
@@ -326,7 +331,6 @@ void CTrajView::OnPaint()
    float fCoeffX = 0.f;
    float fCoeffY = 0.f;
 	
-   CPaintDC dc(this); // device context for painting
    CDC* pDC = &dc;
 
    CPoint Line[2];
