@@ -30,7 +30,7 @@ public:
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_WELLTRAJECTORYCALCULATOR_DIALOG };
+	enum { IDD = IDD_2DDIALOG };
 #endif
 
 	protected:
