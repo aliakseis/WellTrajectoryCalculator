@@ -145,10 +145,14 @@ private:
     std::unique_ptr<CTrajView> m_pView;
 	CToolBar m_ToolBar;
 
+	CSize m_minSize{};
+
 // Implementation
 protected:
 	HICON m_hIcon;
 
 	// Generated message map functions
 	virtual BOOL OnInitDialog();
+public:
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 };

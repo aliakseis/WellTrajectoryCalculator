@@ -151,6 +151,18 @@ CCalcDlg::CCalcDlg(CWnd* pParent /*=nullptr*/)
 	m_bIsotropic = FALSE;
 	m_nTrajectoryType = tkExtendedSTrajectory;
 
+	CDialogTemplate dlgtemplate;
+	if (dlgtemplate.Load(MAKEINTRESOURCE(IDD_2DDIALOG)))
+	{
+		dlgtemplate.GetSizeInPixels(&m_minSize);
+        CRect rect(0, 0, m_minSize.cx, m_minSize.cy);
+        AdjustWindowRectEx(&rect, 
+			WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME,
+			FALSE, 
+			WS_EX_APPWINDOW);
+        m_minSize = rect.Size();
+	}
+
     m_pView = std::make_unique<CTrajView>(*this);
 }
 
@@ -215,6 +227,7 @@ BEGIN_MESSAGE_MAP(CCalcDlg, CDialogEx)
 	ON_UPDATE_COMMAND_UI(IDM_S_TRAJ, OnUpdateSTraj)
 	ON_UPDATE_COMMAND_UI(IDM_EXT_S_TRAJ, OnUpdateExtendedSTraj)
 	ON_WM_VSCROLL()
+	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
 
@@ -1036,3 +1049,12 @@ CTrajView* CCalcDlg::GetTrajView()
 	return STATIC_DOWNCAST(CTrajView, GetParentFrame()->GetActiveView());
 }
 */
+
+
+void CCalcDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
+{
+	CDialogEx::OnGetMinMaxInfo(lpMMI);
+
+	lpMMI->ptMinTrackSize.x = m_minSize.cx;
+	lpMMI->ptMinTrackSize.y = m_minSize.cy;
+}
