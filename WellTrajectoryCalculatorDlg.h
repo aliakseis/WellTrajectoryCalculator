@@ -63,9 +63,9 @@ public:
 	//}}AFX_DATA
 	PLANE_TRAJ_ARR m_c;
 	//	CRect UpdateRect;
-	BOOL m_bValidTrajectory;
-	BOOL m_bIsotropic;
-	BOOL m_bFixAngle;
+	BOOL m_bValidTrajectory = FALSE;
+	BOOL m_bIsotropic = FALSE;
+	BOOL m_bFixAngle = FALSE;
 
 	int  GetMode() { return m_nMode; }
 	BOOL IsWorkingMode();// { return 2 == NBits(m_nMode); }
