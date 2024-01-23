@@ -151,18 +151,6 @@ CCalcDlg::CCalcDlg(CWnd* pParent /*=nullptr*/)
 	m_bIsotropic = FALSE;
 	m_nTrajectoryType = tkExtendedSTrajectory;
 
-	CDialogTemplate dlgtemplate;
-	if (dlgtemplate.Load(MAKEINTRESOURCE(IDD_2DDIALOG)))
-	{
-		dlgtemplate.GetSizeInPixels(&m_minSize);
-        CRect rect(0, 0, m_minSize.cx, m_minSize.cy);
-        AdjustWindowRectEx(&rect, 
-			WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME,
-			FALSE, 
-			WS_EX_APPWINDOW);
-        m_minSize = rect.Size();
-	}
-
     m_pView = std::make_unique<CTrajView>(*this);
 }
 
@@ -284,6 +272,16 @@ BOOL CCalcDlg::OnInitDialog()
 	}
 	for (int i = IDC_SPIN1; i <= IDC_SPIN8; i++)
 		((CSpinButtonCtrl*)GetDlgItem(i))->SetRange(-1, 1);
+
+	CDialogTemplate dlgtemplate;
+	if (dlgtemplate.Load(MAKEINTRESOURCE(IDD_2DDIALOG)))
+	{
+		dlgtemplate.GetSizeInPixels(&m_minSize);
+		CRect rect(0, 0, m_minSize.cx, m_minSize.cy);
+		AdjustWindowRectEx(&rect,
+			GetStyle(), FALSE, GetExStyle());
+        m_minSize = rect.Size();
+	}
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -1055,6 +1053,9 @@ void CCalcDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 {
 	CDialogEx::OnGetMinMaxInfo(lpMMI);
 
-	lpMMI->ptMinTrackSize.x = m_minSize.cx;
-	lpMMI->ptMinTrackSize.y = m_minSize.cy;
+	if (m_minSize.cx && m_minSize.cy)
+	{
+		lpMMI->ptMinTrackSize.x = m_minSize.cx;
+		lpMMI->ptMinTrackSize.y = m_minSize.cy;
+	}
 }
