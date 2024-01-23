@@ -17,7 +17,6 @@ enum TrajViewState
     TVS_DRAGGING
 };
 
-class CTrajDesignContext;
 
 /////////////////////////////////////////////////////////////////////////////
 // CTrajView view
@@ -36,7 +35,6 @@ public:
     int m_nMarker;
     CPoint m_InitialOffset;
     double m_fSin, m_fCos, m_fSavePhi, m_fSaveL, m_fSaveBR, m_fCoeffX, m_fCoeffY;
-    CTrajDesignContext* m_pContext;
     // Operations
 public:
     // Implementation
