@@ -78,7 +78,7 @@ void CTrajView::DrawAxes(CDC* pDC)
 	int nFlag;
    if(m_State != TVS_DRAGGING)
 	   return;
-	double fNorm = 160.f / (double)sqrt(fsqr(m_fCoeffY * m_fCos) + fsqr(m_fCoeffX * m_fSin));
+	double fNorm = 160.f / sqrt(fsqr(m_fCoeffY * m_fCos) + fsqr(m_fCoeffX * m_fSin));
 
 	switch(m_nMarker) {
 		case 0: nFlag = F_PHI1; break;
@@ -358,8 +358,8 @@ void CTrajView::OnPaint()
 	   Line[0].y = (int)(rect.top + fY * fCoeffY);
 	   for(int i = 0; i < 3; i++) 
 		{
-	   	double sin0 = (double)sin(m_CalcDlg.m_c[i].Phi);
-	   	double cos0 = (double)cos(m_CalcDlg.m_c[i].Phi);
+	   	double sin0 = sin(m_CalcDlg.m_c[i].Phi);
+	   	double cos0 = cos(m_CalcDlg.m_c[i].Phi);
 			fX += m_CalcDlg.m_c[i].L * sin0;
 			fY += m_CalcDlg.m_c[i].L * cos0;
 		   Line[1].x = (int)(rect.left +fX * fCoeffX);
@@ -373,13 +373,13 @@ void CTrajView::OnPaint()
 	      	double fR = m_CalcDlg.m_c[i].R;
 	      	fX += fR * cos0;
 	      	fY -= fR * sin0;
-	      	double sin1 = (double)sin(m_CalcDlg.m_c[i + 1].Phi);
-	      	double cos1 = (double)cos(m_CalcDlg.m_c[i + 1].Phi);
+	      	double sin1 = sin(m_CalcDlg.m_c[i + 1].Phi);
+	      	double cos1 = cos(m_CalcDlg.m_c[i + 1].Phi);
 	      	if(!bDraw) {              
-	      	   double fRabs = (double)fabs(fR);
+	      	   double fRabs = fabs(fR);
 	      	   double fAngle = m_CalcDlg.m_c[i + 1].Phi - m_CalcDlg.m_c[i].Phi;
-	      	   while(fAngle > M_PI) fAngle -= (double)(2 * M_PI);
-	      	   while(fAngle < -M_PI) fAngle += (double)(2 * M_PI);
+	      	   while(fAngle > M_PI) fAngle -= (2 * M_PI);
+	      	   while(fAngle < -M_PI) fAngle += (2 * M_PI);
 	      	   BOOL bIsHalfTurn = (fAngle * fR < 0);
                BOOL bExtendX = FALSE;
                BOOL bExtendY = FALSE;
@@ -428,9 +428,9 @@ void CTrajView::OnPaint()
 			   m_Markers[i*2 + 1].Point.x = (Line[0].x + Line[1].x) / 2;
 			   m_Markers[i*2 + 1].Point.y = (Line[0].y + Line[1].y) / 2;
 			   m_Markers[i*2 + 1].fSin = 
-			   	(double)sin((m_CalcDlg.m_c[i].Phi + m_CalcDlg.m_c[i + 1].Phi) / 2);
+			   	sin((m_CalcDlg.m_c[i].Phi + m_CalcDlg.m_c[i + 1].Phi) / 2);
 			   m_Markers[i*2 + 1].fCos =
-			   	(double)cos((m_CalcDlg.m_c[i].Phi + m_CalcDlg.m_c[i + 1].Phi) / 2);
+			   	cos((m_CalcDlg.m_c[i].Phi + m_CalcDlg.m_c[i + 1].Phi) / 2);
 
 			   if(bDraw && m_CalcDlg.m_c[i+1].Phi != m_CalcDlg.m_c[i].Phi &&
 			   	Line[0] != Line[1] && fR != 0) {
@@ -537,10 +537,10 @@ void CTrajView::OnMouseMove(UINT nFlags, CPoint point)
 						m_State = TVS_NONE;
 					} break;
 			case TVS_DRAGGING:
-               double fSensitivity = (double)exp(0.3 * (double)(m_CalcDlg.m_Sensitivity.GetPos() -10));
-			      double x = fSensitivity * (double)(point.x - m_InitialOffset.x);// * sqrt(m_fCoeffY / m_fCoeffX);// - m_Markers[m_nMarker].Point.x;
-			      double y = fSensitivity * (double)(point.y - m_InitialOffset.y);// * sqrt(m_fCoeffX / m_fCoeffY);// - m_Markers[m_nMarker].Point.y;
-               double fConv = (double)sqrt(m_fCoeffX / m_fCoeffY);
+               double fSensitivity = exp(0.3 * (m_CalcDlg.m_Sensitivity.GetPos() -10));
+			      double x = fSensitivity * (point.x - m_InitialOffset.x);// * sqrt(m_fCoeffY / m_fCoeffX);// - m_Markers[m_nMarker].Point.x;
+			      double y = fSensitivity * (point.y - m_InitialOffset.y);// * sqrt(m_fCoeffX / m_fCoeffY);// - m_Markers[m_nMarker].Point.y;
+               double fConv = sqrt(m_fCoeffX / m_fCoeffY);
 
 			      double fLong = y * m_fCos / fConv + 
 			                    x * m_fSin * fConv;  
@@ -552,9 +552,9 @@ void CTrajView::OnMouseMove(UINT nFlags, CPoint point)
 //			      double fTrans =x * m_fCos / m_fCoeffX - 
 //			      				  y * m_fSin / m_fCoeffY;
 
-				  const auto fCoeffPhi = (double)0.5;
-				  const auto fCoeffL = (double)1.;
-				  const auto fCoeffBR = (double)1.;
+				  const auto fCoeffPhi = 0.5;
+				  const auto fCoeffL = 1.;
+				  const auto fCoeffBR = 1.;
 
 					BOOL bAllowed = TRUE;
 		         switch(m_nMarker) 

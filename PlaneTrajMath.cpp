@@ -41,7 +41,7 @@ void RotateUp(PLANE_TRAJ_ARR& m_c)
 double GetRoot(double fAsin, double fAtan, int i)
 {
 	return((0 != i) ^ (fabs(M_PI - fAsin - fAtan) > fabs(fAsin - fAtan))) ?
-		fAsin - fAtan : (double)M_PI - fAsin - fAtan;
+		fAsin - fAtan : M_PI - fAsin - fAtan;
 }
 
 } // namespace
@@ -53,13 +53,13 @@ void CPlaneTrajMath::Direct(int nFlags)
 	if(nFlags & M_ROT_DOWN) RotateDown(m_c);
 	else if(nFlags & M_ROT_UP) RotateUp(m_c);
 
-	sin0 = (double)sin(m_c[0].Phi);
-	sin1 = (double)sin(m_c[1].Phi);
-	sin2 = (double)sin(m_c[2].Phi);
+	sin0 = sin(m_c[0].Phi);
+	sin1 = sin(m_c[1].Phi);
+	sin2 = sin(m_c[2].Phi);
 
-	cos0 = (double)cos(m_c[0].Phi);
-	cos1 = (double)cos(m_c[1].Phi);
-	cos2 = (double)cos(m_c[2].Phi);
+	cos0 = cos(m_c[0].Phi);
+	cos1 = cos(m_c[1].Phi);
+	cos2 = cos(m_c[2].Phi);
 }
 
 void CPlaneTrajMath::Inverse(int nFlags)
@@ -72,14 +72,14 @@ void CPlaneTrajMath::Inverse(int nFlags)
 
 double CPlaneTrajMath::GetTVDError()
 {
-	return (double)fabs(m_c[0].L * cos0 + m_c[0].R * (sin1 - sin0) +
+	return fabs(m_c[0].L * cos0 + m_c[0].R * (sin1 - sin0) +
        			m_c[1].L * cos1 + m_c[1].R * (sin2 - sin1) +
 		 			m_c[2].L * cos2 + m_c[2].R * (sin0 - sin2) - m_fTVD);
 }
 
 double CPlaneTrajMath::GetDispError()
 {
-	return (double)fabs(m_c[0].L * sin0 + m_c[0].R * (cos0 - cos1) +
+	return fabs(m_c[0].L * sin0 + m_c[0].R * (cos0 - cos1) +
    				m_c[1].L * sin1 + m_c[1].R * (cos1 - cos2) +
 					m_c[2].L * sin2 + m_c[2].R * (cos2 - cos0) - m_fDisp);
 }
@@ -103,10 +103,10 @@ BOOL CPlaneTrajMath::FindSolution2x2()
 
 void CPlaneTrajMath::FindAngle()
 {
-	double fArg = fB / (double)sqrt( fC * fC + fD * fD );
-	double fBuf = (double)atan2( fD, fC );
+	double fArg = fB / sqrt( fC * fC + fD * fD );
+	double fBuf = atan2( fD, fC );
 	if(fBuf > -M_PI/2)
-	   if(fBuf < M_PI/2) fA = (double)asin(fArg) - fBuf;
+	   if(fBuf < M_PI/2) fA = asin(fArg) - fBuf;
 	   else fA = double(M_PI - asin(fArg) - fBuf);
 	else fA = double(-M_PI - asin(fArg) - fBuf);
 }
@@ -120,14 +120,14 @@ BOOL CPlaneTrajMath::SimpleTrigonometric()
 	double fLeft = fB * fE - fF * fA; 
 	if(fabs(fLeft) < 1e-10) return FALSE;
 	double fRight = fC * fE - fG * fA;
-	double fArg = (fD * fE - fH * fA) / (double)sqrt( fLeft * fLeft + fRight * fRight);
+	double fArg = (fD * fE - fH * fA) / sqrt( fLeft * fLeft + fRight * fRight);
 	if (fArg < -1 || fArg > 1) return FALSE;
-	double fBuf = (double)atan2(fRight, fLeft);
+	double fBuf = atan2(fRight, fLeft);
 	if(fBuf > -M_PI/2)
-	   if(fBuf < M_PI/2) fA = (double)asin(fArg) - fBuf;
+	   if(fBuf < M_PI/2) fA = asin(fArg) - fBuf;
 	   else fA = double(M_PI - asin(fArg) - fBuf);
 	else fA = double(-M_PI - asin(fArg) - fBuf);
-	fB = ((fC * fF - fG * fB) * (double)cos(fA) + fH * fB - fD * fF) / fLeft;       
+	fB = ((fC * fF - fG * fB) * cos(fA) + fH * fB - fD * fF) / fLeft;       
 	return TRUE;
 }
 
@@ -140,17 +140,17 @@ BOOL CPlaneTrajMath::PuzzleTrigonometric()
 	double fLeft = fA * fC + fB * fE + fF;
 	if(fabs(fLeft) < 1e-10) return FALSE;
 	double fRight = fD - fB * fC + fA * fE;
-	double fArg = (fA + fD * fE + fF * fC) / (double)sqrt( fLeft * fLeft + fRight * fRight);
+	double fArg = (fA + fD * fE + fF * fC) / sqrt( fLeft * fLeft + fRight * fRight);
 	if (fArg < -1 || fArg > 1) return FALSE;
-	double fBuf = (double)atan2(fRight, fLeft);
-	double fAngle = (double)asin(fArg) - fBuf;
-	double fSin = (double)sin(fAngle);
-	double fCos = (double)cos(fAngle);
+	double fBuf = atan2(fRight, fLeft);
+	double fAngle = asin(fArg) - fBuf;
+	double fSin = sin(fAngle);
+	double fCos = cos(fAngle);
 	if(fabs(fE - fCos) < 1e-4 && fabs(fC - fSin) < 1e-4) {
 		fAngle = double(M_PI - asin(fArg) - fBuf);
 		if(fAngle > M_PI) fAngle -= double(2 * M_PI);
-		fSin = (double)sin(fAngle);
-		fCos = (double)cos(fAngle);
+		fSin = sin(fAngle);
+		fCos = cos(fAngle);
 	}
 	if(fabs(fE - fCos) > fabs(fC - fSin))
 	 	fB = (fA * fSin - fB * fCos -fF) / (fE - fCos);
@@ -266,30 +266,30 @@ BOOL CPlaneTrajMath::CalcLwherePhi(int nFlags)
 						m_c[1].L * sin1 - m_c[1].R * (cos1 - cos2) -
 						m_c[2].L * sin2 - m_c[2].R * cos2);
 
-	double fArg = fB / (double)sqrt( fC * fC + fD * fD );
+	double fArg = fB / sqrt( fC * fC + fD * fD );
 	if(fabs(fArg) > 1.) return FALSE;
-	double fBuf = (double)atan2( fD, fC );
+	double fBuf = atan2( fD, fC );
 
    double fPhi[2], fL[2], fTVDErr[2], fDispErr[2];
-   fPhi[0] = (double)asin(fArg) - fBuf;
-   fPhi[1] = (double)(M_PI - asin(fArg) -fBuf);
+   fPhi[0] = asin(fArg) - fBuf;
+   fPhi[1] = (M_PI - asin(fArg) -fBuf);
    for(int i =0; i<2; i++) {
       while(fPhi[i] > M_PI) fPhi[i] -= double(2 * M_PI);
       while(fPhi[i] <-M_PI) fPhi[i] += double(2 * M_PI);
 	   if(fPhi[i] > -M_PI/4 && fPhi[i] < M_PI/4)
-	   		fL[i] = (double)((fC - fB * sin(fPhi[i])) / cos(fPhi[i]));
-	   else  fL[i] = (double)((-fD + fB * cos(fPhi[i])) / sin(fPhi[i])); 
+	   		fL[i] = ((fC - fB * sin(fPhi[i])) / cos(fPhi[i]));
+	   else  fL[i] = ((-fD + fB * cos(fPhi[i])) / sin(fPhi[i])); 
    }
    m_c[0].Phi = fPhi[0];
-   sin0 = (double)sin(fPhi[0]);
-   cos0 = (double)cos(fPhi[0]);
+   sin0 = sin(fPhi[0]);
+   cos0 = cos(fPhi[0]);
    m_c[0].L = fL[0];
    fTVDErr[0] = GetTVDError();
    fDispErr[0] = GetDispError();
 
    m_c[0].Phi = fPhi[1];
-   sin0 = (double)sin(fPhi[1]);
-   cos0 = (double)cos(fPhi[1]);
+   sin0 = sin(fPhi[1]);
+   cos0 = cos(fPhi[1]);
    m_c[0].L = fL[1];
    fTVDErr[1] = GetTVDError();
    fDispErr[1] = GetDispError();
@@ -427,36 +427,36 @@ BOOL CPlaneTrajMath::CalcPhiPhi(int nFlags)
 	fF = m_fDisp+ m_c[1].R * cos2 - m_c[2].L * sin2 - m_c[2].R * cos2;
 	double fLeft = fA * fD - fB * fC;
 	double fRight= fB * fD + fA * fC;
-	double fArg = (fE * fE + fF * fF - fA * fA - fB * fB - fC * fC - fD * fD) / (double)2. /
-						(double)sqrt(fLeft * fLeft + fRight * fRight);
+	double fArg = (fE * fE + fF * fF - fA * fA - fB * fB - fC * fC - fD * fD) / 2. /
+						sqrt(fLeft * fLeft + fRight * fRight);
 	if (fabs(fArg) > 1) return FALSE;
-   fArg = (double)asin(fArg);
-	double fAtan = (double)atan2(fRight, fLeft);
+   fArg = asin(fArg);
+	double fAtan = atan2(fRight, fLeft);
 	BOOL bResult = FALSE;
 	for(i = 0; i < 2; i++) {
       double fDelta = - GetRoot(fArg, fAtan, i);
       while(fDelta < -M_PI) fDelta += double(2 * M_PI);
       while(fDelta > M_PI) fDelta -= double(2 * M_PI);
       if(fDelta * m_c[0].R < 0) continue;
-      double fSin = (double)sin(fDelta);
-      double fCos = (double)cos(fDelta);
+      double fSin = sin(fDelta);
+      double fCos = cos(fDelta);
 		double fLeft1 = -fB - fC * fSin - fD * fCos;
 		double fRight1= fA + fC * fCos - fD * fSin;
-		double fArg1 = fE / (double)sqrt(fLeft1 * fLeft1 + fRight1 * fRight1);
+		double fArg1 = fE / sqrt(fLeft1 * fLeft1 + fRight1 * fRight1);
 		if (fabs(fArg1) > 1) continue;
-	   fArg1 = (double)asin(fArg1);
-		double fAtan1 = (double)atan2(fRight1, fLeft1);
+	   fArg1 = asin(fArg1);
+		double fAtan1 = atan2(fRight1, fLeft1);
 		for(int j = 0; j < 2; j++) {
          m_c[0].Phi = GetRoot(fArg1, fAtan1, j);
          while(m_c[0].Phi < -M_PI) m_c[0].Phi += double(2 * M_PI);
          while(m_c[0].Phi >  M_PI) m_c[0].Phi -= double(2 * M_PI);
-         sin0 = (double)sin(m_c[0].Phi);
-         cos0 = (double)cos(m_c[0].Phi);
+         sin0 = sin(m_c[0].Phi);
+         cos0 = cos(m_c[0].Phi);
          m_c[1].Phi = m_c[0].Phi + fDelta;
          while(m_c[1].Phi < -M_PI) m_c[1].Phi += double(2 * M_PI);
          while(m_c[1].Phi >  M_PI) m_c[1].Phi -= double(2 * M_PI);
-         sin1 = (double)sin(m_c[1].Phi);
-         cos1 = (double)cos(m_c[1].Phi);
+         sin1 = sin(m_c[1].Phi);
+         cos1 = cos(m_c[1].Phi);
 		   if(GetTVDError() < 0.1 && GetDispError() < 0.1) {
 				bResult = TRUE; goto L1;
 		   }

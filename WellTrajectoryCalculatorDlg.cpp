@@ -62,8 +62,8 @@ void ShowControl(CWnd* pWnd, BOOL Show)
 
 }
 
-const auto Deg2Rad = (double)(M_PI / 180.0);
-const auto Rad2Deg = (double)(180.0 / M_PI);
+const auto Deg2Rad = (M_PI / 180.0);
+const auto Rad2Deg = (180.0 / M_PI);
 
 
 // CAboutDlg dialog used for App About
@@ -108,19 +108,19 @@ CCalcDlg::CCalcDlg(CWnd* pParent /*=nullptr*/)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
-	m_fL1 = (double)100.0;
-	m_fPhi1 = (double)10.0;
-	m_fBR1 = (double)40.0;
+	m_fL1 = 100.0;
+	m_fPhi1 = 10.0;
+	m_fBR1 = 40.0;
 
-	m_fL2 = (double)100.0;
-	m_fPhi2 = (double)50.0;
-	m_fBR2 = (double)-50.0;
+	m_fL2 = 100.0;
+	m_fPhi2 = 50.0;
+	m_fBR2 = -50.0;
 
-	m_fL3 = (double)100.0;
-	m_fPhi3 = (double)0.0;
+	m_fL3 = 100.0;
+	m_fPhi3 = 0.0;
 
-	m_fTVD = (double)435.4;
-	m_fDisp = (double)183.89;
+	m_fTVD = 435.4;
+	m_fDisp = 183.89;
 
 	m_nMode = 0;
 	m_bValidTrajectory = FALSE;
@@ -705,7 +705,7 @@ BOOL CCalcDlg::MakeChoice(int nFlag, double* fVal, double fBound, int nCount, BO
 
 void CCalcDlg::OnButton1()
 {
-	if (!MakeChoice(F_PHI1, &m_fPhi1, (double)360., 2000, FALSE))
+	if (!MakeChoice(F_PHI1, &m_fPhi1, 360., 2000, FALSE))
 		GetDlgItem(IDC_BUTTON1)->EnableWindow(FALSE);
 }
 
@@ -717,13 +717,13 @@ void CCalcDlg::OnButton2()
 
 void CCalcDlg::OnButton3()
 {
-	if (!MakeChoice(F_R1, &m_fBR1, (double)MaxRate * 2, 2000, TRUE))
+	if (!MakeChoice(F_R1, &m_fBR1, MaxRate * 2, 2000, TRUE))
 		GetDlgItem(IDC_BUTTON3)->EnableWindow(FALSE);
 }
 
 void CCalcDlg::OnButton4()
 {
-	if (!MakeChoice(F_PHI2, &m_fPhi2, (double)360., 2000, FALSE))
+	if (!MakeChoice(F_PHI2, &m_fPhi2, 360., 2000, FALSE))
 		GetDlgItem(IDC_BUTTON4)->EnableWindow(FALSE);
 }
 
@@ -741,7 +741,7 @@ void CCalcDlg::OnButton6()
 
 void CCalcDlg::OnButton7()
 {
-	if (!MakeChoice(F_PHI3, &m_fPhi3, (double)360., 2000, FALSE))
+	if (!MakeChoice(F_PHI3, &m_fPhi3, 360., 2000, FALSE))
 		GetDlgItem(IDC_BUTTON7)->EnableWindow(FALSE);
 }
 
