@@ -308,7 +308,7 @@ bool CPlaneTrajMath::CalcLwherePhi(int nFlags)
     fDispErr[1] = GetDispError();
 
     //   if((fTVDErr[1]>fTVDErr[0])^(fDispErr[1]>fDispErr[0])) return false;
-    if (fL[1] < 0 || (fTVDErr[1] > fTVDErr[0]) && (fDispErr[1] > fDispErr[0]) && fL[0] >= 0)
+    if (fL[1] < 0 || ((fTVDErr[1] > fTVDErr[0]) && (fDispErr[1] > fDispErr[0]) && fL[0] >= 0))
     {
         if (fTVDErr[0] > 0.1 || fDispErr[0] > 0.1)
             return false;

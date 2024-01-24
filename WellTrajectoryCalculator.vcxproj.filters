@@ -66,9 +66,15 @@
     <None Include="res\WellTrajectoryCalculator.rc2">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="RES\NODROP.CUR">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\WellTrajectoryCalculator.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\bmp3d_de.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -37,11 +37,11 @@ public:
 #endif
 
 protected:
-    virtual void DoDataExchange(CDataExchange* pDX);  // DDX/DDV support
+    void DoDataExchange(CDataExchange* pDX) override;  // DDX/DDV support
 
 public:
-    virtual void OnOK();
-    virtual void OnCancel();
+    void OnOK() override;
+    void OnCancel() override;
     bool TryToApply();
 
     double m_fPhi1;
