@@ -25,6 +25,56 @@ double GetStep(double fRange)
     return fStep;
 }
 
+void DrawMarker(CDC* pDC, CPoint Point)
+{
+    CRect rect;
+    rect.left = Point.x - 4;
+    rect.top = Point.y - 4;
+    rect.right = Point.x + 4;
+    rect.bottom = Point.y + 4;
+    pDC->Rectangle(&rect);
+}
+
+bool IsMarkerHere(CPoint Marker, CPoint Mouse)
+{
+    return (Mouse.x >= Marker.x - 4 && Mouse.x <= Marker.x + 4 && Mouse.y >= Marker.y - 4 && Mouse.y <= Marker.y + 4);
+}
+
+bool FitEllipseRect(CRect& rect)
+{
+    rect.NormalizeRect();
+    int nWidth = rect.Width();
+    int nHeight = rect.Height();
+    if (nWidth < 3 || nHeight < 3)
+        return false;
+    if (nWidth > 32766)
+        if (nHeight > 32766)
+            return false;
+        else
+        {
+            if (abs(rect.right) > abs(rect.left))
+                rect.right = rect.left + 32766;
+            else
+                rect.left = rect.right - 32766;
+            int nDelta = int(double(nHeight) * (1. - sqrt(32766. / double(nWidth))) / 2.);
+            rect.top += nDelta;
+            rect.bottom -= nDelta;
+        }
+    else if (nHeight > 32766)
+    {
+        if (abs(rect.bottom) > abs(rect.top))
+            rect.bottom = rect.top + 32766;
+        else
+            rect.bottom -= 32766;
+        int nDelta = int(double(nWidth) * (1. - sqrt(32766. / double(nHeight))) / 2.);
+        rect.left += nDelta;
+        rect.right -= nDelta;
+    }
+    return true;
+}
+
+double fsqr(double x) { return x * x; }
+
 }  // namespace
 
 /////////////////////////////////////////////////////////////////////////////
@@ -46,32 +96,21 @@ ON_WM_NCHITTEST()
 ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
-void DrawMarker(CDC* pDC, CPoint Point)
-{
-    CRect rect;
-    rect.left = Point.x - 4;
-    rect.top = Point.y - 4;
-    rect.right = Point.x + 4;
-    rect.bottom = Point.y + 4;
-    pDC->Rectangle(&rect);
-}
-
-bool IsMarkerHere(CPoint Marker, CPoint Mouse)
-{
-    return (Mouse.x >= Marker.x - 4 && Mouse.x <= Marker.x + 4 && Mouse.y >= Marker.y - 4 && Mouse.y <= Marker.y + 4);
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // CTrajView drawing
 
-inline double fsqr(double x) { return x * x; }
 
 void CTrajView::DrawAxes(CDC* pDC)
 {
-    CPoint Line[2];
-    int nFlag;
     if (m_State != TVS_DRAGGING)
         return;
+
+    CPen penAxes;
+    penAxes.CreatePen(PS_SOLID, 0, RGB(0, 0, 0));
+    auto pOldPen = pDC->SelectObject(&penAxes);
+
+    CPoint Line[2];
+    int nFlag;
     double fNorm = 160.f / sqrt(fsqr(m_fCoeffY * m_fCos) + fsqr(m_fCoeffX * m_fSin));
 
     switch (m_nMarker)
@@ -148,337 +187,384 @@ void CTrajView::DrawAxes(CDC* pDC)
         Line[1].y = (int)(m_InitialOffset.y + fNorm * m_fCoeffY * m_fCos * 0.03);
     }
     pDC->Polyline(Line, 2);
+
+    pDC->SelectObject(pOldPen);
 }
 
-bool FitEllipseRect(CRect& rect)
-{
-    rect.NormalizeRect();
-    int nWidth = rect.Width();
-    int nHeight = rect.Height();
-    if (nWidth < 3 || nHeight < 3)
-        return false;
-    if (nWidth > 32766)
-        if (nHeight > 32766)
-            return false;
-        else
-        {
-            if (abs(rect.right) > abs(rect.left))
-                rect.right = rect.left + 32766;
-            else
-                rect.left = rect.right - 32766;
-            int nDelta = int(double(nHeight) * (1. - sqrt(32766. / double(nWidth))) / 2.);
-            rect.top += nDelta;
-            rect.bottom -= nDelta;
-        }
-    else if (nHeight > 32766)
-    {
-        if (abs(rect.bottom) > abs(rect.top))
-            rect.bottom = rect.top + 32766;
-        else
-            rect.bottom -= 32766;
-        int nDelta = int(double(nWidth) * (1. - sqrt(32766. / double(nHeight))) / 2.);
-        rect.left += nDelta;
-        rect.right -= nDelta;
-    }
-    return true;
-}
 
 const auto Epsilon = 1.e-6f;
 
+
+void CTrajView::DrawGridAndScale(CDC* pDC, const CRect& rect, const double fXmin, const double fXmax,
+                                 const double fYmin, const double fYmax, const double fX, const double fCoeffX,
+                                 const double fY, const double fCoeffY)
+{
+    double fEvenStepX = GetStep((fXmax - fXmin) / 4);
+    double fEvenStepY = GetStep((fYmax - fYmin) / 4);
+    double fStepX = fEvenStepX;
+    double fStepY = fEvenStepY;
+    if (m_CalcDlg.m_bIsotropic)
+        fStepX = fStepY = max(fStepX, fStepY);
+
+    double fOffsetX = fX * fCoeffX;
+    while (fOffsetX + Epsilon >= 0) fOffsetX -= fStepX * fCoeffX;
+    fOffsetX += rect.left;
+
+    double fOffsetY = fY * fCoeffY;
+    while (fOffsetY + Epsilon >= 0) fOffsetY -= fStepY * fCoeffY;
+    fOffsetY += rect.top;
+
+    CPen penGrid(PS_SOLID, 1, RGB(196, 196, 196));
+    auto pOldPen = pDC->SelectObject(&penGrid);
+
+    int nScaleLeft, nScaleRight, nScaleTop, nScaleBottom;
+    for (int i = 1;; i++)
+    {
+        int x = int(fOffsetX + fStepX * fCoeffX * i);
+        if (x > rect.right)
+            break;
+        pDC->MoveTo(x, rect.bottom);
+        pDC->LineTo(x, rect.top);
+        switch (i)
+        {
+        case 1:
+            nScaleLeft = x;
+            break;
+        case 2:
+            nScaleRight = x;
+            break;
+        }
+    }
+
+    for (int i = 1;; i++)
+    {
+        int y = int(fOffsetY + fStepY * fCoeffY * i);
+        if (y > rect.bottom)
+            break;
+        pDC->MoveTo(rect.left, y);
+        pDC->LineTo(rect.right, y);
+        switch (i)
+        {
+        case 1:
+            nScaleTop = y;
+            break;
+        case 2:
+            nScaleBottom = y;
+            break;
+        }
+    }
+
+    pDC->MoveTo(nScaleLeft, rect.top - 8);
+    pDC->LineTo(nScaleRight, rect.top - 8);
+    pDC->MoveTo(nScaleLeft, rect.top - 6);
+    pDC->LineTo(nScaleLeft, rect.top - 11);
+    pDC->MoveTo(nScaleRight, rect.top - 6);
+    pDC->LineTo(nScaleRight, rect.top - 11);
+
+    pDC->MoveTo(rect.left - 8, nScaleTop);
+    pDC->LineTo(rect.left - 8, nScaleBottom);
+    pDC->MoveTo(rect.left - 6, nScaleTop);
+    pDC->LineTo(rect.left - 11, nScaleTop);
+    pDC->MoveTo(rect.left - 6, nScaleBottom);
+    pDC->LineTo(rect.left - 11, nScaleBottom);
+
+    LOGFONT lf;
+    memset(&lf, 0, sizeof(LOGFONT));
+    lf.lfHeight = 14;
+    lf.lfWeight = 400;
+    _tcscpy_s(lf.lfFaceName, _T("Arial"));
+
+    CString strBuf;
+    CString strUnit;  // = GetLabel_(UV_4_TRAJ_LENGTH);
+
+    CFont fontScaleHorz;
+    fontScaleHorz.CreateFontIndirect(&lf);
+    CFont* pOldFont = pDC->SelectObject(&fontScaleHorz);
+    pDC->SetBkMode(TRANSPARENT);
+    pDC->SetTextAlign(TA_LEFT | TA_BASELINE);
+    strBuf.Format(_T("%.0f %s"), fEvenStepX, (LPCTSTR)strUnit);
+    pDC->TextOut(nScaleRight + 6, rect.top - 6, strBuf);
+
+    lf.lfEscapement = 900;
+    lf.lfHeight = 12;
+    CFont fontScaleVert;
+    fontScaleVert.CreateFontIndirect(&lf);
+    pDC->SelectObject(&fontScaleVert);
+    pDC->SetTextAlign(TA_RIGHT | TA_BASELINE);
+    strBuf.Format(_T("%.0f %s"), fEvenStepY, (LPCTSTR)strUnit);
+    pDC->TextOut(rect.left - 6, nScaleBottom + 6, strBuf);
+    pDC->SelectObject(pOldFont);
+
+    pDC->SelectObject(pOldPen);
+
+    CBrush* pOldBrush = pDC->SelectObject(CBrush::FromHandle((HBRUSH)GetStockObject(NULL_BRUSH)));
+    pDC->Rectangle(&rect);
+    pDC->SelectObject(pOldBrush);
+}
+
+void CTrajView::UpdateMinMax(int i, double& fX, double& fY, double& fR, double& sin0, double& sin1, double& cos0,
+                               double& cos1, double& fXmin, double& fXmax, double& fYmin, double& fYmax)
+{
+    double fRabs = fabs(fR);
+    double fAngle = m_CalcDlg.m_c[i + 1].Phi - m_CalcDlg.m_c[i].Phi;
+    while (fAngle > M_PI) fAngle -= (2 * M_PI);
+    while (fAngle < -M_PI) fAngle += (2 * M_PI);
+    bool bIsHalfTurn = (fAngle * fR < 0);
+    bool bExtendX = false;
+    bool bExtendY = false;
+    int nMayBeLoop = 0;
+    if (sin0 <= 0 && sin1 >= 0)
+    {
+        fXmin = fmin(fXmin, fX - fRabs);
+        if (bIsHalfTurn)
+            bExtendY = true;
+    }
+    else if (sin0 >= 0 && sin1 <= 0)
+    {
+        fXmax = fmax(fXmax, fX + fRabs);
+        if (bIsHalfTurn)
+            bExtendY = true;
+    }
+    else
+        nMayBeLoop++;
+
+    if (cos0 <= 0 && cos1 >= 0)
+    {
+        fYmin = fmin(fYmin, fY - fRabs);
+        if (bIsHalfTurn)
+            bExtendX = true;
+    }
+    else if (cos0 >= 0 && cos1 <= 0)
+    {
+        fYmax = fmax(fYmax, fY + fRabs);
+        if (bIsHalfTurn)
+            bExtendX = true;
+    }
+    else
+        nMayBeLoop++;
+    if (!bIsHalfTurn)
+        nMayBeLoop = 0;
+
+    if (nMayBeLoop == 2 || bExtendX)
+    {
+        fXmin = fmin(fXmin, fX - fRabs);
+        fXmax = fmax(fXmax, fX + fRabs);
+    }
+    if (nMayBeLoop == 2 || bExtendY)
+    {
+        fYmin = fmin(fYmin, fY - fRabs);
+        fYmax = fmax(fYmax, fY + fRabs);
+    }
+}
+
+
+// A method that performs custom painting on the view
 void CTrajView::OnPaint()
 {
+    // If the trajectory is not valid, do nothing
     if (!m_CalcDlg.m_bValidTrajectory)
     {
         ValidateRect(NULL);
         return;
     }
 
-    CPaintDC dc(this);  // device context for painting
+    // Create a device context for painting
+    CPaintDC dc(this);
 
+    // Get the client rectangle of the view
     CRect rect;
     GetClientRect(&rect);
 
+    // Clip the device context to the client rectangle
     dc.IntersectClipRect(rect);
 
+    // Adjust the rectangle to leave some margins
     rect.left += /*nDlgWidth +*/ 20;
     rect.top += 20;
     rect.right -= 12;
     rect.bottom -= 12;
 
+    // Initialize the minimum and maximum values of x and y coordinates
     double fXmin, fXmax, fYmin, fYmax;
     if (m_CalcDlg.m_fTVD > 0)
     {
-        fYmin = 0.f;
+        fYmin = 0.0;
         fYmax = m_CalcDlg.m_fTVD;
     }
     else
     {
         fYmin = m_CalcDlg.m_fTVD;
-        fYmax = 0.f;
+        fYmax = 0.0;
     }
 
     if (m_CalcDlg.m_fDisp > 0)
     {
-        fXmin = 0.f;
+        fXmin = 0.0;
         fXmax = m_CalcDlg.m_fDisp;
     }
     else
     {
         fXmin = m_CalcDlg.m_fDisp;
-        fXmax = 0.f;
+        fXmax = 0.0;
     }
 
-    double fX = 0.f;
-    double fY = 0.f;
+    // Initialize the current values of x and y coordinates
+    double fX = 0.0;
+    double fY = 0.0;
 
-    double fCoeffX = 0.f;
-    double fCoeffY = 0.f;
+    // Initialize the coefficients for scaling the coordinates
+    double fCoeffX = 0.0;
+    double fCoeffY = 0.0;
 
-    CDC* pDC = &dc;
-
-    CPoint Line[2];
+    // Create a pen for drawing the trajectory
     CPen Pen;
     Pen.CreatePen(PS_SOLID, 3, RGB(0, 0, 255));
     CPen* pOldPen = NULL;
 
+    // Loop twice: first to calculate the coefficients, second to draw the trajectory
     for (int bDraw = 0; bDraw < 2; bDraw++)
     {
         if (bDraw)
         {
-            //	Grid drawing
-            // double fEvenStepX = GetStep(ToUnits_(fXmax - fXmin, UV_4_TRAJ_LENGTH) / 4);
-            // double fEvenStepY = GetStep(ToUnits_(fYmax - fYmin, UV_4_TRAJ_LENGTH) / 4);
-            // double fStepX = FromUnits_(fEvenStepX, UV_4_TRAJ_LENGTH);
-            // double fStepY = FromUnits_(fEvenStepY, UV_4_TRAJ_LENGTH);
-            double fEvenStepX = GetStep((fXmax - fXmin) / 4);
-            double fEvenStepY = GetStep((fYmax - fYmin) / 4);
-            double fStepX = fEvenStepX;
-            double fStepY = fEvenStepY;
-            if (m_CalcDlg.m_bIsotropic)
-                fStepX = fStepY = max(fStepX, fStepY);
+            // Draw the grid and the scale on the device context
+            DrawGridAndScale(&dc, rect, fXmin, fXmax, fYmin, fYmax, fX, fCoeffX, fY, fCoeffY);
 
-            double fOffsetX = fX * fCoeffX;
-            while (fOffsetX + Epsilon >= 0) fOffsetX -= fStepX * fCoeffX;
-            fOffsetX += rect.left;
+            // Draw the axes on the device context
+            DrawAxes(&dc);
 
-            double fOffsetY = fY * fCoeffY;
-            while (fOffsetY + Epsilon >= 0) fOffsetY -= fStepY * fCoeffY;
-            fOffsetY += rect.top;
-
-            CPen penGrid(PS_SOLID, 1, RGB(196, 196, 196));
-            pOldPen = pDC->SelectObject(&penGrid);
-
-            int nScaleLeft, nScaleRight, nScaleTop, nScaleBottom;
-            for (int i = 1;; i++)
-            {
-                int x = int(fOffsetX + fStepX * fCoeffX * i);
-                if (x > rect.right)
-                    break;
-                pDC->MoveTo(x, rect.bottom);
-                pDC->LineTo(x, rect.top);
-                switch (i)
-                {
-                case 1:
-                    nScaleLeft = x;
-                    break;
-                case 2:
-                    nScaleRight = x;
-                    break;
-                }
-            }
-
-            for (int i = 1;; i++)
-            {
-                int y = int(fOffsetY + fStepY * fCoeffY * i);
-                if (y > rect.bottom)
-                    break;
-                pDC->MoveTo(rect.left, y);
-                pDC->LineTo(rect.right, y);
-                switch (i)
-                {
-                case 1:
-                    nScaleTop = y;
-                    break;
-                case 2:
-                    nScaleBottom = y;
-                    break;
-                }
-            }
-
-            pDC->MoveTo(nScaleLeft, rect.top - 8);
-            pDC->LineTo(nScaleRight, rect.top - 8);
-            pDC->MoveTo(nScaleLeft, rect.top - 6);
-            pDC->LineTo(nScaleLeft, rect.top - 11);
-            pDC->MoveTo(nScaleRight, rect.top - 6);
-            pDC->LineTo(nScaleRight, rect.top - 11);
-
-            pDC->MoveTo(rect.left - 8, nScaleTop);
-            pDC->LineTo(rect.left - 8, nScaleBottom);
-            pDC->MoveTo(rect.left - 6, nScaleTop);
-            pDC->LineTo(rect.left - 11, nScaleTop);
-            pDC->MoveTo(rect.left - 6, nScaleBottom);
-            pDC->LineTo(rect.left - 11, nScaleBottom);
-
-            LOGFONT lf;
-            memset(&lf, 0, sizeof(LOGFONT));
-            lf.lfHeight = 14;
-            lf.lfWeight = 400;
-            _tcscpy_s(lf.lfFaceName, _T("Arial"));
-
-            CString strBuf;
-            CString strUnit;  // = GetLabel_(UV_4_TRAJ_LENGTH);
-
-            CFont fontScaleHorz;
-            fontScaleHorz.CreateFontIndirect(&lf);
-            CFont* pOldFont = pDC->SelectObject(&fontScaleHorz);
-            pDC->SetBkMode(TRANSPARENT);
-            pDC->SetTextAlign(TA_LEFT | TA_BASELINE);
-            strBuf.Format(_T("%.0f %s"), fEvenStepX, (LPCTSTR)strUnit);
-            pDC->TextOut(nScaleRight + 6, rect.top - 6, strBuf);
-
-            lf.lfEscapement = 900;
-            lf.lfHeight = 12;
-            CFont fontScaleVert;
-            fontScaleVert.CreateFontIndirect(&lf);
-            pDC->SelectObject(&fontScaleVert);
-            pDC->SetTextAlign(TA_RIGHT | TA_BASELINE);
-            strBuf.Format(_T("%.0f %s"), fEvenStepY, (LPCTSTR)strUnit);
-            pDC->TextOut(rect.left - 6, nScaleBottom + 6, strBuf);
-            pDC->SelectObject(pOldFont);
-            CPen penAxes;
-            penAxes.CreatePen(PS_SOLID, 0, RGB(0, 0, 0));
-            pDC->SelectObject(&penAxes);
-
-            CBrush* pOldBrush = pDC->SelectObject(CBrush::FromHandle((HBRUSH)GetStockObject(NULL_BRUSH)));
-            pDC->Rectangle(&rect);
-            pDC->SelectObject(pOldBrush);
-
-            DrawAxes(pDC);
-
-            pDC->SelectObject(&Pen);
+            // Select the pen for drawing the trajectory
+            pOldPen = dc.SelectObject(&Pen);
         }
 
+        // Create an array of points for drawing the lines
+        CPoint Line[2];
         Line[0].x = (int)(rect.left + fX * fCoeffX);
         Line[0].y = (int)(rect.top + fY * fCoeffY);
+
+        // Loop through the segments of the trajectory
         for (int i = 0; i < 3; i++)
         {
+            // Calculate the sine and cosine of the angle of the segment
             double sin0 = sin(m_CalcDlg.m_c[i].Phi);
             double cos0 = cos(m_CalcDlg.m_c[i].Phi);
+
+            // Update the x and y coordinates by adding the length of the segment
             fX += m_CalcDlg.m_c[i].L * sin0;
             fY += m_CalcDlg.m_c[i].L * cos0;
+
+            // Update the second point of the line
             Line[1].x = (int)(rect.left + fX * fCoeffX);
             Line[1].y = (int)(rect.top + fY * fCoeffY);
+
+            // Update the marker position and orientation
             m_Markers[i * 2].Point.x = (Line[0].x + Line[1].x) / 2;
             m_Markers[i * 2].Point.y = (Line[0].y + Line[1].y) / 2;
             m_Markers[i * 2].fSin = sin0;
             m_Markers[i * 2].fCos = cos0;
+
+            // Draw the line if in the second loop
             if (bDraw)
-                pDC->Polyline(Line, 2);
+            {
+                dc.Polyline(Line, 2);
+            }
+
+            // If not the last segment, draw the circle
             if (i < 2)
             {
+                // Get the radius of the circle
                 double fR = m_CalcDlg.m_c[i].R;
+
+                // Update the x and y coordinates by adding the offset of the circle
                 fX += fR * cos0;
                 fY -= fR * sin0;
+
+                // Calculate the sine and cosine of the angle of the next segment
                 double sin1 = sin(m_CalcDlg.m_c[i + 1].Phi);
                 double cos1 = cos(m_CalcDlg.m_c[i + 1].Phi);
+
+                // If in the first loop, update the minimum and maximum values of x and y coordinates
                 if (!bDraw)
                 {
-                    double fRabs = fabs(fR);
-                    double fAngle = m_CalcDlg.m_c[i + 1].Phi - m_CalcDlg.m_c[i].Phi;
-                    while (fAngle > M_PI) fAngle -= (2 * M_PI);
-                    while (fAngle < -M_PI) fAngle += (2 * M_PI);
-                    bool bIsHalfTurn = (fAngle * fR < 0);
-                    bool bExtendX = false;
-                    bool bExtendY = false;
-                    int nMayBeLoop = 0;
-                    if (sin0 <= 0 && sin1 >= 0)
-                    {
-                        fXmin = fmin(fXmin, fX - fRabs);
-                        if (bIsHalfTurn)
-                            bExtendY = true;
-                    }
-                    else if (sin0 >= 0 && sin1 <= 0)
-                    {
-                        fXmax = fmax(fXmax, fX + fRabs);
-                        if (bIsHalfTurn)
-                            bExtendY = true;
-                    }
-                    else
-                        nMayBeLoop++;
-
-                    if (cos0 <= 0 && cos1 >= 0)
-                    {
-                        fYmin = fmin(fYmin, fY - fRabs);
-                        if (bIsHalfTurn)
-                            bExtendX = true;
-                    }
-                    else if (cos0 >= 0 && cos1 <= 0)
-                    {
-                        fYmax = fmax(fYmax, fY + fRabs);
-                        if (bIsHalfTurn)
-                            bExtendX = true;
-                    }
-                    else
-                        nMayBeLoop++;
-                    if (!bIsHalfTurn)
-                        nMayBeLoop = 0;
-
-                    if (nMayBeLoop == 2 || bExtendX)
-                    {
-                        fXmin = fmin(fXmin, fX - fRabs);
-                        fXmax = fmax(fXmax, fX + fRabs);
-                    }
-                    if (nMayBeLoop == 2 || bExtendY)
-                    {
-                        fYmin = fmin(fYmin, fY - fRabs);
-                        fYmax = fmax(fYmax, fY + fRabs);
-                    }
+                    UpdateMinMax(i, fX, fY, fR, sin0, sin1, cos0, cos1, fXmin, fXmax, fYmin, fYmax);
                 }
+
+                // Create a rectangle that bounds the circle
                 CRect bound;
                 bound.left = (int)(rect.left + (fX - fR) * fCoeffX);
                 bound.top = (int)(rect.top + (fY - fR) * fCoeffY);
                 bound.right = (int)(rect.left + (fX + fR) * fCoeffX);
                 bound.bottom = (int)(rect.top + (fY + fR) * fCoeffY);
 
+                // Update the x and y coordinates by subtracting the offset of the circle
                 fX -= fR * cos1;
                 fY += fR * sin1;
 
+                // Update the first point of the line
                 Line[0].x = (int)(rect.left + fX * fCoeffX);
                 Line[0].y = (int)(rect.top + fY * fCoeffY);
+
+                // Update the marker position and orientation
                 m_Markers[i * 2 + 1].Point.x = (Line[0].x + Line[1].x) / 2;
                 m_Markers[i * 2 + 1].Point.y = (Line[0].y + Line[1].y) / 2;
                 m_Markers[i * 2 + 1].fSin = sin((m_CalcDlg.m_c[i].Phi + m_CalcDlg.m_c[i + 1].Phi) / 2);
                 m_Markers[i * 2 + 1].fCos = cos((m_CalcDlg.m_c[i].Phi + m_CalcDlg.m_c[i + 1].Phi) / 2);
 
+                // Draw the arc if in the second loop and the circle is not degenerate
                 if (bDraw && m_CalcDlg.m_c[i + 1].Phi != m_CalcDlg.m_c[i].Phi && Line[0] != Line[1] && fR != 0)
                 {
+                    // Fit the ellipse to the rectangle
                     bool bArcOK = FitEllipseRect(bound);
+
+                    // Draw the arc with the correct orientation
                     if (bArcOK)
+                    {
                         if (fR < 0)
-                            bArcOK = pDC->Arc(bound, Line[0], Line[1]);
+                        {
+                            bArcOK = dc.Arc(bound, Line[0], Line[1]);
+                        }
                         else
-                            bArcOK = pDC->Arc(bound, Line[1], Line[0]);
+                        {
+                            bArcOK = dc.Arc(bound, Line[1], Line[0]);
+                        }
+                    }
+
+                    // If the arc drawing failed, draw a line instead
                     if (!bArcOK)
-                        pDC->Polyline(Line, 2);
+                    {
+                        dc.Polyline(Line, 2);
+                    }
                 }
             }
         }
+
+        // Calculate the coefficients for scaling the coordinates
         fX = -fXmin;
         fY = -fYmin;
         fCoeffX = (rect.Width()) / (fXmax - fXmin);
         fCoeffY = (rect.Height()) / (fYmax - fYmin);
+
+        // If the trajectory is isotropic, use the same coefficient for both axes
         if (m_CalcDlg.m_bIsotropic)
+        {
             if (fCoeffX < fCoeffY)
+            {
                 fCoeffY = fCoeffX;
+            }
             else
+            {
                 fCoeffX = fCoeffY;
+            }
+        }
     }
-    pDC->SelectObject(pOldPen);
+
+    // Restore the old pen
+    dc.SelectObject(pOldPen);
     if (m_State != TVS_DRAGGING)
     {
         m_fCoeffX = fCoeffX;
         m_fCoeffY = fCoeffY;
-        for (int i = 0; i < GetMarkerNumber(); i++) DrawMarker(pDC, m_Markers[i].Point);
+        for (int i = 0; i < GetMarkerNumber(); i++) 
+            DrawMarker(&dc, m_Markers[i].Point);
     }
 }
 
