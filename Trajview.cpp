@@ -302,8 +302,9 @@ void CTrajView::DrawGridAndScale(CDC* pDC, const CRect& rect, const double fXmin
     pDC->SelectObject(pOldBrush);
 }
 
-void CTrajView::UpdateMinMax(int i, double& fX, double& fY, double& fR, double& sin0, double& sin1, double& cos0,
-                               double& cos1, double& fXmin, double& fXmax, double& fYmin, double& fYmax)
+void CTrajView::UpdateMinMax(const int i, const double fX, const double fY, const double fR, const double sin0,
+                             const double sin1, const double cos0, const double cos1, double& fXmin, double& fXmax,
+                             double& fYmin, double& fYmax)
 {
     double fRabs = fabs(fR);
     double fAngle = m_CalcDlg.m_c[i + 1].Phi - m_CalcDlg.m_c[i].Phi;

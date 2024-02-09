@@ -41,7 +41,8 @@ public:
 protected:
     void DrawGridAndScale(CDC* pDC, const CRect& rect, const double fXmin, const double fXmax, const double fYmin,
                           const double fYmax, const double fX, const double fCoeffX, const double fY, const double fCoeffY);
-    void UpdateMinMax(int i, double& fX, double& fY, double& fR, double& sin0, double& sin1, double& cos0, double& cos1,
+    void UpdateMinMax(const int i, const double fX, const double fY, const double fR, const double sin0,
+                      const double sin1, const double cos0, const double cos1,
                         double& fXmin, double& fXmax, double& fYmin, double& fYmax);
     void DrawAxes(CDC* pDC);
     int GetSegNumber();
