@@ -25,7 +25,7 @@ double GetStep(double fRange)
     return fStep;
 }
 
-void DrawMarker(CDC* pDC, CPoint Point)
+void DrawMarker(CDC* pDC, const CPoint& Point)
 {
     CRect rect;
     rect.left = Point.x - 4;
@@ -35,7 +35,7 @@ void DrawMarker(CDC* pDC, CPoint Point)
     pDC->Rectangle(&rect);
 }
 
-bool IsMarkerHere(CPoint Marker, CPoint Mouse)
+bool IsMarkerHere(const CPoint& Marker, const CPoint& Mouse)
 {
     return (Mouse.x >= Marker.x - 4 && Mouse.x <= Marker.x + 4 && Mouse.y >= Marker.y - 4 && Mouse.y <= Marker.y + 4);
 }
@@ -302,8 +302,9 @@ void CTrajView::DrawGridAndScale(CDC* pDC, const CRect& rect, const double fXmin
     pDC->SelectObject(pOldBrush);
 }
 
-void CTrajView::UpdateMinMax(int i, double& fX, double& fY, double& fR, double& sin0, double& sin1, double& cos0,
-                               double& cos1, double& fXmin, double& fXmax, double& fYmin, double& fYmax)
+void CTrajView::UpdateMinMax(const int i, const double fX, const double fY, const double fR, const double sin0,
+                             const double sin1, const double cos0, const double cos1, double& fXmin, double& fXmax,
+                             double& fYmin, double& fYmax)
 {
     double fRabs = fabs(fR);
     double fAngle = m_CalcDlg.m_c[i + 1].Phi - m_CalcDlg.m_c[i].Phi;
@@ -546,14 +547,7 @@ void CTrajView::OnPaint()
         // If the trajectory is isotropic, use the same coefficient for both axes
         if (m_CalcDlg.m_bIsotropic)
         {
-            if (fCoeffX < fCoeffY)
-            {
-                fCoeffY = fCoeffX;
-            }
-            else
-            {
-                fCoeffX = fCoeffY;
-            }
+            fCoeffX = fCoeffY = min(fCoeffX, fCoeffY);
         }
     }
 
