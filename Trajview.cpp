@@ -42,38 +42,6 @@ bool IsMarkerHere(const CPoint& Marker, const CPoint& Mouse)
     return (Mouse.x >= Marker.x - 4 && Mouse.x <= Marker.x + 4 && Mouse.y >= Marker.y - 4 && Mouse.y <= Marker.y + 4);
 }
 
-bool FitEllipseRect(CRect& rect)
-{
-    rect.NormalizeRect();
-    int nWidth = rect.Width();
-    int nHeight = rect.Height();
-    if (nWidth < 3 || nHeight < 3)
-        return false;
-    if (nWidth > 32766)
-        if (nHeight > 32766)
-            return false;
-        else
-        {
-            if (abs(rect.right) > abs(rect.left))
-                rect.right = rect.left + 32766;
-            else
-                rect.left = rect.right - 32766;
-            int nDelta = int(double(nHeight) * (1. - sqrt(32766. / double(nWidth))) / 2.);
-            rect.top += nDelta;
-            rect.bottom -= nDelta;
-        }
-    else if (nHeight > 32766)
-    {
-        if (abs(rect.bottom) > abs(rect.top))
-            rect.bottom = rect.top + 32766;
-        else
-            rect.bottom -= 32766;
-        int nDelta = int(double(nWidth) * (1. - sqrt(32766. / double(nHeight))) / 2.);
-        rect.left += nDelta;
-        rect.right -= nDelta;
-    }
-    return true;
-}
 
 double fsqr(double x) { return x * x; }
 
@@ -495,22 +463,9 @@ void CTrajView::OnPaint()
                 // Draw the arc if in the second loop and the circle is not degenerate
                 if (bDraw && m_CalcDlg.m_c[i + 1].Phi != m_CalcDlg.m_c[i].Phi && Line[0] != Line[1] && fR != 0)
                 {
-                    // Fit the ellipse to the rectangle
-                    bool bArcOK = FitEllipseRect(bound);
-
                     // Draw the arc with the correct orientation
-                    if (bArcOK)
-                    {
-                        if (fR < 0)
-                        {
-                            bArcOK = dc.Arc(bound, Line[0], Line[1]);
-                        }
-                        else
-                        {
-                            bArcOK = dc.Arc(bound, Line[1], Line[0]);
-                        }
-                    }
-
+                    auto bArcOK = (fR < 0) ? dc.Arc(bound, Line[0], Line[1])
+                        : dc.Arc(bound, Line[1], Line[0]);
                     // If the arc drawing failed, draw a line instead
                     if (!bArcOK)
                     {
