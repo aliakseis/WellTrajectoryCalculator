@@ -6,6 +6,8 @@
 
 #include "resource.h"
 
+#include <algorithm>
+
 #ifdef _DEBUG
 #undef THIS_FILE
 static char BASED_CODE THIS_FILE[] = __FILE__;
@@ -204,7 +206,7 @@ void CTrajView::DrawGridAndScale(CDC* pDC, const CRect& rect, const double fXmin
     double fStepX = fEvenStepX;
     double fStepY = fEvenStepY;
     if (m_CalcDlg.m_bIsotropic)
-        fStepX = fStepY = max(fStepX, fStepY);
+        fStepX = fStepY = std::max(fStepX, fStepY);
 
     double fOffsetX = fX * fCoeffX;
     while (fOffsetX + Epsilon >= 0) fOffsetX -= fStepX * fCoeffX;
@@ -386,28 +388,8 @@ void CTrajView::OnPaint()
     rect.bottom -= 12;
 
     // Initialize the minimum and maximum values of x and y coordinates
-    double fXmin, fXmax, fYmin, fYmax;
-    if (m_CalcDlg.m_fTVD > 0)
-    {
-        fYmin = 0.0;
-        fYmax = m_CalcDlg.m_fTVD;
-    }
-    else
-    {
-        fYmin = m_CalcDlg.m_fTVD;
-        fYmax = 0.0;
-    }
-
-    if (m_CalcDlg.m_fDisp > 0)
-    {
-        fXmin = 0.0;
-        fXmax = m_CalcDlg.m_fDisp;
-    }
-    else
-    {
-        fXmin = m_CalcDlg.m_fDisp;
-        fXmax = 0.0;
-    }
+    auto [fYmin, fYmax] = std::minmax({0.0, m_CalcDlg.m_fTVD});
+    auto [fXmin, fXmax] = std::minmax({0.0, m_CalcDlg.m_fDisp});
 
     // Initialize the current values of x and y coordinates
     double fX = 0.0;
@@ -547,7 +529,7 @@ void CTrajView::OnPaint()
         // If the trajectory is isotropic, use the same coefficient for both axes
         if (m_CalcDlg.m_bIsotropic)
         {
-            fCoeffX = fCoeffY = min(fCoeffX, fCoeffY);
+            fCoeffX = fCoeffY = std::min(fCoeffX, fCoeffY);
         }
     }
 
