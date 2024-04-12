@@ -171,10 +171,12 @@ void CTrajView::DrawGridAndScale(CDC* pDC, const CRect& rect, const double fXmin
 {
     double fEvenStepX = GetStep((fXmax - fXmin) / 4);
     double fEvenStepY = GetStep((fYmax - fYmin) / 4);
+    if (m_CalcDlg.m_bIsotropic)
+        fEvenStepX = fEvenStepY = std::max(fEvenStepX, fEvenStepY);
     double fStepX = fEvenStepX;
     double fStepY = fEvenStepY;
-    if (m_CalcDlg.m_bIsotropic)
-        fStepX = fStepY = std::max(fStepX, fStepY);
+    //if (m_CalcDlg.m_bIsotropic)
+    //    fStepX = fStepY = std::max(fStepX, fStepY);
 
     double fOffsetX = fX * fCoeffX;
     while (fOffsetX + Epsilon >= 0) fOffsetX -= fStepX * fCoeffX;
@@ -187,41 +189,28 @@ void CTrajView::DrawGridAndScale(CDC* pDC, const CRect& rect, const double fXmin
     CPen penGrid(PS_SOLID, 1, RGB(196, 196, 196));
     auto pOldPen = pDC->SelectObject(&penGrid);
 
-    int nScaleLeft, nScaleRight, nScaleTop, nScaleBottom;
+    auto xLam = [=](int i) { return int(fOffsetX + fStepX * fCoeffX * i); };
+    const int nScaleLeft = xLam(1);
+    const int nScaleRight = xLam(2);
     for (int i = 1;; i++)
     {
-        int x = int(fOffsetX + fStepX * fCoeffX * i);
+        int x = xLam(i);
         if (x > rect.right)
             break;
         pDC->MoveTo(x, rect.bottom);
         pDC->LineTo(x, rect.top);
-        switch (i)
-        {
-        case 1:
-            nScaleLeft = x;
-            break;
-        case 2:
-            nScaleRight = x;
-            break;
-        }
     }
 
+    auto yLam = [=](int i) { return int(fOffsetY + fStepY * fCoeffY * i); };
+    const int nScaleTop = yLam(1);
+    const int nScaleBottom = yLam(2);
     for (int i = 1;; i++)
     {
-        int y = int(fOffsetY + fStepY * fCoeffY * i);
+        int y = yLam(i);
         if (y > rect.bottom)
             break;
         pDC->MoveTo(rect.left, y);
         pDC->LineTo(rect.right, y);
-        switch (i)
-        {
-        case 1:
-            nScaleTop = y;
-            break;
-        case 2:
-            nScaleBottom = y;
-            break;
-        }
     }
 
     pDC->MoveTo(nScaleLeft, rect.top - 8);
