@@ -846,7 +846,6 @@ void CCalcDlg::SetTrajectoryType(int nTrajectoryType)
         ShowControl(GetDlgItem(IDC_EDIT7), false);
         ShowControl(GetDlgItem(IDC_CHECK7), false);
         //			ShowControl(GetDlgItem(IDC_BUTTON7), false);
-        ShowControl(GetDlgItem(IDC_EDIT7Units), false);
         m_nMode &= ~(F_R2 | F_PHI3);
     case tkSTrajectory:
         CheckDlgButton(IDC_CHECK8, false);
@@ -874,7 +873,6 @@ void CCalcDlg::SetTrajectoryType(int nTrajectoryType)
         ShowControl(GetDlgItem(IDC_EDIT7), true);
         ShowControl(GetDlgItem(IDC_CHECK7), true);
         //			ShowControl(GetDlgItem(IDC_BUTTON7), true);
-        ShowControl(GetDlgItem(IDC_EDIT7Units), true);
     case tkExtendedJTrajectory:
         ShowControl(GetDlgItem(IDC_EDIT5), true);
         ShowControl(GetDlgItem(IDC_CHECK5), true);
@@ -884,6 +882,13 @@ void CCalcDlg::SetTrajectoryType(int nTrajectoryType)
     default:
         ASSERT(0);
     }
+
+    ShowControl(GetDlgItem(IDC_EDIT5Units), m_nTrajectoryType >= tkExtendedJTrajectory);
+    ShowControl(GetDlgItem(IDC_EDIT6Units), m_nTrajectoryType >= tkSTrajectory);
+    ShowControl(GetDlgItem(IDC_EDIT7Units), m_nTrajectoryType >= tkSTrajectory);
+    ShowControl(GetDlgItem(IDC_EDIT8Units), m_nTrajectoryType >= tkExtendedSTrajectory);
+
+    ShowControl(GetDlgItem(IDC_LABEL_BR_2), m_nTrajectoryType >= tkSTrajectory);
 
     if (bInvalidate)
         SetValidTrajectory(false);
