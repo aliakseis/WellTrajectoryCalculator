@@ -7,6 +7,7 @@
 #include "resource.h"
 
 #include <algorithm>
+#include <tuple>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -165,12 +166,11 @@ void CTrajView::DrawAxes(CDC* pDC)
 const auto Epsilon = 1.e-6f;
 
 
-void CTrajView::DrawGridAndScale(CDC* pDC, const CRect& rect, const double fXmin, const double fXmax,
-                                 const double fYmin, const double fYmax, const double fX, const double fCoeffX,
-                                 const double fY, const double fCoeffY)
+void CTrajView::DrawGridAndScale(CDC* pDC, const CRect& rect, Double2D fmin, Double2D fmax,
+    Double2D fPos, Double2D fCoeff)
 {
-    double fEvenStepX = GetStep((fXmax - fXmin) / 4);
-    double fEvenStepY = GetStep((fYmax - fYmin) / 4);
+    double fEvenStepX = GetStep((fmax.x - fmin.x) / 4);
+    double fEvenStepY = GetStep((fmax.y - fmin.y) / 4);
     if (m_CalcDlg.m_bIsotropic)
         fEvenStepX = fEvenStepY = std::max(fEvenStepX, fEvenStepY);
     double fStepX = fEvenStepX;
@@ -178,18 +178,18 @@ void CTrajView::DrawGridAndScale(CDC* pDC, const CRect& rect, const double fXmin
     //if (m_CalcDlg.m_bIsotropic)
     //    fStepX = fStepY = std::max(fStepX, fStepY);
 
-    double fOffsetX = fX * fCoeffX;
-    while (fOffsetX + Epsilon >= 0) fOffsetX -= fStepX * fCoeffX;
+    double fOffsetX = fPos.x * fCoeff.x;
+    while (fOffsetX + Epsilon >= 0) fOffsetX -= fStepX * fCoeff.x;
     fOffsetX += rect.left;
 
-    double fOffsetY = fY * fCoeffY;
-    while (fOffsetY + Epsilon >= 0) fOffsetY -= fStepY * fCoeffY;
+    double fOffsetY = fPos.y * fCoeff.y;
+    while (fOffsetY + Epsilon >= 0) fOffsetY -= fStepY * fCoeff.y;
     fOffsetY += rect.top;
 
     CPen penGrid(PS_SOLID, 1, RGB(196, 196, 196));
     auto pOldPen = pDC->SelectObject(&penGrid);
 
-    auto xLam = [=](int i) { return int(fOffsetX + fStepX * fCoeffX * i); };
+    auto xLam = [=](int i) { return int(fOffsetX + fStepX * fCoeff.x * i); };
     const int nScaleLeft = xLam(1);
     const int nScaleRight = xLam(2);
     for (int i = 1;; i++)
@@ -201,7 +201,7 @@ void CTrajView::DrawGridAndScale(CDC* pDC, const CRect& rect, const double fXmin
         pDC->LineTo(x, rect.top);
     }
 
-    auto yLam = [=](int i) { return int(fOffsetY + fStepY * fCoeffY * i); };
+    auto yLam = [=](int i) { return int(fOffsetY + fStepY * fCoeff.y * i); };
     const int nScaleTop = yLam(1);
     const int nScaleBottom = yLam(2);
     for (int i = 1;; i++)
@@ -261,9 +261,8 @@ void CTrajView::DrawGridAndScale(CDC* pDC, const CRect& rect, const double fXmin
     pDC->SelectObject(pOldBrush);
 }
 
-void CTrajView::UpdateMinMax(const int i, const double fX, const double fY, const double fR, const double sin0,
-                             const double sin1, const double cos0, const double cos1, double& fXmin, double& fXmax,
-                             double& fYmin, double& fYmax)
+void CTrajView::UpdateMinMax(int i, Double2D fPos, double fR, double sin0,
+    double sin1, double cos0, double cos1, Double2D& fMin, Double2D& fMax)
 {
     double fRabs = fabs(fR);
     double fAngle = m_CalcDlg.m_c[i + 1].Phi - m_CalcDlg.m_c[i].Phi;
@@ -275,13 +274,13 @@ void CTrajView::UpdateMinMax(const int i, const double fX, const double fY, cons
     int nMayBeLoop = 0;
     if (sin0 <= 0 && sin1 >= 0)
     {
-        fXmin = fmin(fXmin, fX - fRabs);
+        fMin.x = fmin(fMin.x, fPos.x - fRabs);
         if (bIsHalfTurn)
             bExtendY = true;
     }
     else if (sin0 >= 0 && sin1 <= 0)
     {
-        fXmax = fmax(fXmax, fX + fRabs);
+        fMax.x = fmax(fMax.x, fPos.x + fRabs);
         if (bIsHalfTurn)
             bExtendY = true;
     }
@@ -290,13 +289,13 @@ void CTrajView::UpdateMinMax(const int i, const double fX, const double fY, cons
 
     if (cos0 <= 0 && cos1 >= 0)
     {
-        fYmin = fmin(fYmin, fY - fRabs);
+        fMin.y = fmin(fMin.y, fPos.y - fRabs);
         if (bIsHalfTurn)
             bExtendX = true;
     }
     else if (cos0 >= 0 && cos1 <= 0)
     {
-        fYmax = fmax(fYmax, fY + fRabs);
+        fMax.y = fmax(fMax.y, fPos.y + fRabs);
         if (bIsHalfTurn)
             bExtendX = true;
     }
@@ -307,13 +306,13 @@ void CTrajView::UpdateMinMax(const int i, const double fX, const double fY, cons
 
     if (nMayBeLoop == 2 || bExtendX)
     {
-        fXmin = fmin(fXmin, fX - fRabs);
-        fXmax = fmax(fXmax, fX + fRabs);
+        fMin.x = fmin(fMin.x, fPos.x - fRabs);
+        fMax.x = fmax(fMax.x, fPos.x + fRabs);
     }
     if (nMayBeLoop == 2 || bExtendY)
     {
-        fYmin = fmin(fYmin, fY - fRabs);
-        fYmax = fmax(fYmax, fY + fRabs);
+        fMin.y = fmin(fMin.y, fPos.y - fRabs);
+        fMax.y = fmax(fMax.y, fPos.y + fRabs);
     }
 }
 
@@ -345,8 +344,9 @@ void CTrajView::OnPaint()
     rect.bottom -= 12;
 
     // Initialize the minimum and maximum values of x and y coordinates
-    auto [fYmin, fYmax] = std::minmax({0.0, m_CalcDlg.m_fTVD});
-    auto [fXmin, fXmax] = std::minmax({0.0, m_CalcDlg.m_fDisp});
+    Double2D fMin, fMax;
+    std::tie(fMin.y, fMax.y) = std::minmax({0.0, m_CalcDlg.m_fTVD});
+    std::tie(fMin.x, fMax.x) = std::minmax({0.0, m_CalcDlg.m_fDisp});
 
     // Initialize the current values of x and y coordinates
     double fX = 0.0;
@@ -367,7 +367,7 @@ void CTrajView::OnPaint()
         if (bDraw)
         {
             // Draw the grid and the scale on the device context
-            DrawGridAndScale(&dc, rect, fXmin, fXmax, fYmin, fYmax, fX, fCoeffX, fY, fCoeffY);
+            DrawGridAndScale(&dc, rect, fMin, fMax, { fX, fY }, { fCoeffX, fCoeffY });
 
             // Draw the axes on the device context
             DrawAxes(&dc);
@@ -425,7 +425,7 @@ void CTrajView::OnPaint()
                 // If in the first loop, update the minimum and maximum values of x and y coordinates
                 if (!bDraw)
                 {
-                    UpdateMinMax(i, fX, fY, fR, sin0, sin1, cos0, cos1, fXmin, fXmax, fYmin, fYmax);
+                    UpdateMinMax(i, { fX, fY }, fR, sin0, sin1, cos0, cos1, fMin, fMax);
                 }
 
                 // Create a rectangle that bounds the circle
@@ -465,10 +465,10 @@ void CTrajView::OnPaint()
         }
 
         // Calculate the coefficients for scaling the coordinates
-        fX = -fXmin;
-        fY = -fYmin;
-        fCoeffX = (rect.Width()) / (fXmax - fXmin);
-        fCoeffY = (rect.Height()) / (fYmax - fYmin);
+        fX = -fMin.x;
+        fY = -fMin.y;
+        fCoeffX = (rect.Width()) / (fMax.x - fMin.x);
+        fCoeffY = (rect.Height()) / (fMax.y - fMin.y);
 
         // If the trajectory is isotropic, use the same coefficient for both axes
         if (m_CalcDlg.m_bIsotropic)

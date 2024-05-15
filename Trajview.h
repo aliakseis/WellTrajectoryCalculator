@@ -17,6 +17,7 @@ enum TrajViewState
     TVS_DRAGGING
 };
 
+struct Double2D { double x, y; };
 
 /////////////////////////////////////////////////////////////////////////////
 // CTrajView view
@@ -39,11 +40,10 @@ public:
 public:
     // Implementation
 protected:
-    void DrawGridAndScale(CDC* pDC, const CRect& rect, double fXmin, double fXmax, double fYmin,
-                          double fYmax, double fX, double fCoeffX, double fY, double fCoeffY);
-    void UpdateMinMax(int i, double fX, double fY, double fR, double sin0,
-                      double sin1, double cos0, double cos1,
-                        double& fXmin, double& fXmax, double& fYmin, double& fYmax);
+    void DrawGridAndScale(CDC* pDC, const CRect& rect, Double2D fmin, Double2D fmax, 
+        Double2D fPos, Double2D fCoeff);
+    void UpdateMinMax(int i, Double2D fPos, double fR, double sin0,
+                      double sin1, double cos0, double cos1, Double2D& fmin, Double2D& fmax);
     void DrawAxes(CDC* pDC);
     int GetSegNumber();
     int GetMarkerNumber();
