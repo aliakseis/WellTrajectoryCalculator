@@ -196,6 +196,8 @@ ON_WM_VSCROLL()
 ON_WM_GETMINMAXINFO()
 ON_BN_CLICKED(IDC_ADD_TO_CLIPBOOK, &CCalcDlg::OnAddToClipbook)
 ON_BN_CLICKED(IDC_CLIPBOOK, &CCalcDlg::OnRestoreFromClipbook)
+ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTW, 0, 0xFFFF, &CCalcDlg::OnToolTipText)
+ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTA, 0, 0xFFFF, &CCalcDlg::OnToolTipText)
 END_MESSAGE_MAP()
 
 // CWellTrajectoryCalculatorDlg message handlers
@@ -233,7 +235,7 @@ BOOL CCalcDlg::OnInitDialog()
 
     m_pView->SubclassDlgItem(IDC_TRAJECTORY_VIEW, this);
 
-    m_ToolBar.CreateEx(this);
+    m_ToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_ALIGN_TOP | CBRS_TOOLTIPS | CBRS_FLYBY);
     m_ToolBar.LoadToolBar(IDR_2D_DESIGN);
     RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
 
@@ -1027,4 +1029,57 @@ void CCalcDlg::OnRestoreFromClipbook()
         m_c = m_clip;
         SetValidTrajectory(true);
     }
+}
+
+BOOL CCalcDlg::OnToolTipText(UINT, NMHDR* pNMHDR, LRESULT* pResult)
+{
+    ASSERT(pNMHDR->code == TTN_NEEDTEXTA || pNMHDR->code == TTN_NEEDTEXTW);
+
+    // If there is a top-level routing frame, let it handle the message
+    if (GetRoutingFrame() != NULL)
+        return FALSE;
+
+    TOOLTIPTEXTA* pTTTA = (TOOLTIPTEXTA*)pNMHDR;
+    TOOLTIPTEXTW* pTTTW = (TOOLTIPTEXTW*)pNMHDR;
+    auto nID = pNMHDR->idFrom;
+
+    if (pNMHDR->code == TTN_NEEDTEXTA && (pTTTA->uFlags & TTF_IDISHWND) ||
+        pNMHDR->code == TTN_NEEDTEXTW && (pTTTW->uFlags & TTF_IDISHWND))
+    {
+        // idFrom is actually the HWND of the tool
+        nID = ::GetDlgCtrlID((HWND)nID);
+    }
+
+    if (nID != 0) // will be zero on a separator
+    {
+        TCHAR szFullText[512]{};
+        AfxLoadString(nID, szFullText);
+
+#ifndef _UNICODE
+        if (pNMHDR->code == TTN_NEEDTEXTA)
+        {
+            lstrcpyn(pTTTA->szText, szFullText, sizeof(pTTTA->szText));
+        }
+        else
+        {
+            _mbstowcsz(pTTTW->szText, szFullText, sizeof(pTTTW->szText));
+        }
+#else
+        if (pNMHDR->code == TTN_NEEDTEXTA)
+        {
+            _wcstombsz(pTTTA->szText, szFullText, sizeof(pTTTA->szText));
+        }
+        else
+        {
+            lstrcpyn(pTTTW->szText, szFullText, sizeof(pTTTW->szText));
+        }
+#endif
+        * pResult = 0;
+
+        // Bring the tooltip window above other popup windows
+        ::SetWindowPos(pNMHDR->hwndFrom, HWND_TOP, 0, 0, 0, 0,
+            SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOMOVE | SWP_NOOWNERZORDER);
+        return TRUE;
+    }
+    return FALSE;
 }
