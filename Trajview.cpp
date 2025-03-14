@@ -46,6 +46,50 @@ bool IsMarkerHere(const CPoint& Marker, const CPoint& Mouse)
 
 double fsqr(double x) { return x * x; }
 
+void DrawAxis(CDC* pDC,
+    const CPoint& origin,
+    double norm,
+    double A,   // multiplier for x offset
+    double B,   // multiplier for y offset
+    bool expanded)
+{
+    // Working array for two endpoints
+    CPoint line[2];
+
+    if (expanded)
+    {
+        // Main axis line:
+        // For a generic vector (A, B) we draw from (origin - norm*(A, -B))
+        // to (origin + norm*(A, -B)).
+        line[0].x = static_cast<int>(origin.x - norm * A);
+        line[0].y = static_cast<int>(origin.y + norm * B);
+        line[1].x = static_cast<int>(origin.x + norm * A);
+        line[1].y = static_cast<int>(origin.y - norm * B);
+        pDC->Polyline(line, 2);
+
+        // First auxiliary segment:
+        line[0].x = static_cast<int>(origin.x + norm * A * 0.55);
+        line[0].y = static_cast<int>(origin.y - norm * B * 0.55);
+        line[1].x = static_cast<int>(origin.x + norm * A * 0.45 + norm * B * 0.03);
+        line[1].y = static_cast<int>(origin.y - norm * B * 0.45 + norm * A * 0.03);
+        pDC->Polyline(line, 2);
+
+        // Second auxiliary segment:
+        line[1].x = static_cast<int>(origin.x + norm * A * 0.45 - norm * B * 0.03);
+        line[1].y = static_cast<int>(origin.y - norm * B * 0.45 - norm * A * 0.03);
+        pDC->Polyline(line, 2);
+    }
+    else
+    {
+        // Draw a short axis line at 3% of norm.
+        line[0].x = static_cast<int>(origin.x - norm * A * 0.03);
+        line[0].y = static_cast<int>(origin.y + norm * B * 0.03);
+        line[1].x = static_cast<int>(origin.x + norm * A * 0.03);
+        line[1].y = static_cast<int>(origin.y - norm * B * 0.03);
+        pDC->Polyline(line, 2);
+    }
+}
+
 }  // namespace
 
 /////////////////////////////////////////////////////////////////////////////
@@ -76,89 +120,49 @@ void CTrajView::DrawAxes(CDC* pDC)
     if (m_State != TVS_DRAGGING)
         return;
 
+    // Create and select the pen for drawing axes.
     CPen penAxes;
     penAxes.CreatePen(PS_SOLID, 0, RGB(0, 0, 0));
     auto pOldPen = pDC->SelectObject(&penAxes);
 
-    CPoint Line[2];
-    int nFlag;
-    double fNorm = 160.f / sqrt(fsqr(m_fCoeffY * m_fCos) + fsqr(m_fCoeffX * m_fSin));
+    // Pre-calculate norm.
+    double norm = 160.0 / sqrt(fsqr(m_fCoeffY * m_fCos) + fsqr(m_fCoeffX * m_fSin));
 
+    // Determine the flag for the first set ("Phi" axes).
+    int phiFlag = 0;
     switch (m_nMarker)
     {
-    case 0:
-        nFlag = F_PHI1;
-        break;
-    case 2:
-        nFlag = F_PHI2;
-        break;
-    case 4:
-        nFlag = F_PHI3;
-        break;
-    default:
-        nFlag = 0x00FF;
+    case 0: phiFlag = F_PHI1; break;
+    case 2: phiFlag = F_PHI2; break;
+    case 4: phiFlag = F_PHI3; break;
+    default: phiFlag = 0x00FF;
     }
-    if (m_CalcDlg.GetEditFlags() & nFlag)
-    {
-        Line[0].x = (int)(m_InitialOffset.x - fNorm * m_fCoeffY * m_fCos);
-        Line[0].y = (int)(m_InitialOffset.y + fNorm * m_fCoeffX * m_fSin);
-        Line[1].x = (int)(m_InitialOffset.x + fNorm * m_fCoeffY * m_fCos);
-        Line[1].y = (int)(m_InitialOffset.y - fNorm * m_fCoeffX * m_fSin);
-        pDC->Polyline(Line, 2);
-        Line[0].x = (int)(m_InitialOffset.x + fNorm * m_fCoeffY * m_fCos * 0.55);
-        Line[0].y = (int)(m_InitialOffset.y - fNorm * m_fCoeffX * m_fSin * 0.55);
-        Line[1].x = (int)(m_InitialOffset.x + fNorm * m_fCoeffY * m_fCos * 0.45 + fNorm * m_fCoeffX * m_fSin * 0.03);
-        Line[1].y = (int)(m_InitialOffset.y - fNorm * m_fCoeffX * m_fSin * 0.45 + fNorm * m_fCoeffY * m_fCos * 0.03);
-        pDC->Polyline(Line, 2);
-        Line[1].x = (int)(m_InitialOffset.x + fNorm * m_fCoeffY * m_fCos * 0.45 - fNorm * m_fCoeffX * m_fSin * 0.03);
-        Line[1].y = (int)(m_InitialOffset.y - fNorm * m_fCoeffX * m_fSin * 0.45 - fNorm * m_fCoeffY * m_fCos * 0.03);
-    }
-    else
-    {
-        Line[0].x = (int)(m_InitialOffset.x - fNorm * m_fCoeffY * m_fCos * 0.03);
-        Line[0].y = (int)(m_InitialOffset.y + fNorm * m_fCoeffX * m_fSin * 0.03);
-        Line[1].x = (int)(m_InitialOffset.x + fNorm * m_fCoeffY * m_fCos * 0.03);
-        Line[1].y = (int)(m_InitialOffset.y - fNorm * m_fCoeffX * m_fSin * 0.03);
-    }
-    pDC->Polyline(Line, 2);
+    bool expandedPhi = (m_CalcDlg.GetEditFlags() & phiFlag) != 0;
+    // For the "Phi" axes use these multipliers:
+    // x component: m_fCoeffY * m_fCos,
+    // y component: m_fCoeffX * m_fSin.
+    DrawAxis(pDC, m_InitialOffset, norm, m_fCoeffY * m_fCos, m_fCoeffX * m_fSin, expandedPhi);
+
+    // Determine the flag for the second set ("L" axes).
+    int lFlag = 0;
     switch (m_nMarker)
     {
-    case 0:
-        nFlag = F_L1;
-        break;
-    case 2:
-        nFlag = F_L2;
-        break;
-    case 4:
-        nFlag = F_L3;
-        break;
-    default:
-        nFlag = 0;
+    case 0: lFlag = F_L1; break;
+    case 2: lFlag = F_L2; break;
+    case 4: lFlag = F_L3; break;
+    default: lFlag = 0;
     }
-    if (/*!(m_nMarker & 1) && (*/ m_CalcDlg.GetEditFlags() & nFlag)
-    {
-        Line[0].x = (int)(m_InitialOffset.x - fNorm * m_fCoeffX * m_fSin);
-        Line[0].y = (int)(m_InitialOffset.y - fNorm * m_fCoeffY * m_fCos);
-        Line[1].x = (int)(m_InitialOffset.x + fNorm * m_fCoeffX * m_fSin);
-        Line[1].y = (int)(m_InitialOffset.y + fNorm * m_fCoeffY * m_fCos);
-        pDC->Polyline(Line, 2);
-        Line[0].x = (int)(m_InitialOffset.x + fNorm * m_fCoeffX * m_fSin * 0.55);
-        Line[0].y = (int)(m_InitialOffset.y + fNorm * m_fCoeffY * m_fCos * 0.55);
-        Line[1].x = (int)(m_InitialOffset.x + fNorm * m_fCoeffX * m_fSin * 0.45 + fNorm * m_fCoeffY * m_fCos * 0.03);
-        Line[1].y = (int)(m_InitialOffset.y + fNorm * m_fCoeffY * m_fCos * 0.45 - fNorm * m_fCoeffX * m_fSin * 0.03);
-        pDC->Polyline(Line, 2);
-        Line[1].x = (int)(m_InitialOffset.x + fNorm * m_fCoeffX * m_fSin * 0.45 - fNorm * m_fCoeffY * m_fCos * 0.03);
-        Line[1].y = (int)(m_InitialOffset.y + fNorm * m_fCoeffY * m_fCos * 0.45 + fNorm * m_fCoeffX * m_fSin * 0.03);
-    }
-    else
-    {
-        Line[0].x = (int)(m_InitialOffset.x - fNorm * m_fCoeffX * m_fSin * 0.03);
-        Line[0].y = (int)(m_InitialOffset.y - fNorm * m_fCoeffY * m_fCos * 0.03);
-        Line[1].x = (int)(m_InitialOffset.x + fNorm * m_fCoeffX * m_fSin * 0.03);
-        Line[1].y = (int)(m_InitialOffset.y + fNorm * m_fCoeffY * m_fCos * 0.03);
-    }
-    pDC->Polyline(Line, 2);
+    bool expandedL = (m_CalcDlg.GetEditFlags() & lFlag) != 0;
+    // For the "L" axes the original code draws from:
+    //   Line[0]: initial.x - norm*m_fCoeffX*m_fSin, initial.y - norm*m_fCoeffY*m_fCos
+    //   Line[1]: initial.x + norm*m_fCoeffX*m_fSin, initial.y + norm*m_fCoeffY*m_fCos
+    // To achieve that with our DrawAxis helper (which computes endpoints as
+    // origin ± norm*(A, -B)), we can set:
+    //    A = m_fCoeffX * m_fSin,
+    //    B = - m_fCoeffY * m_fCos.
+    DrawAxis(pDC, m_InitialOffset, norm, m_fCoeffX * m_fSin, -m_fCoeffY * m_fCos, expandedL);
 
+    // Restore the original pen.
     pDC->SelectObject(pOldPen);
 }
 
